@@ -2,13 +2,12 @@ import * as React from "react";
 import {
   Affix,
   Button,
-  Icon,
-  Drawer,
-  List,
-  Avatar,
   Checkbox,
+  Drawer,
+  Icon,
   InputNumber,
-  Layout
+  Layout,
+  List
 } from "antd";
 import "./App.css";
 
@@ -76,15 +75,15 @@ class ShoppingCartItem extends React.Component {
 }
 
 export class ShoppingCartAffix extends React.Component {
-  state = { visible: false };
+  public state = { visible: false };
 
-  showDrawer = () => {
+  private showDrawer = () => {
     this.setState({
       visible: true
     });
   };
 
-  onClose = () => {
+  private onClose = () => {
     this.setState({
       visible: false
     });
@@ -139,18 +138,12 @@ export class ShoppingCartAffix extends React.Component {
 const listData: any = [];
 for (let i = 0; i < 5; i++) {
   listData.push({
-    href: "http://ant.design",
-    title: `ant design part ${i}`,
     avatar: "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
-    description:
-      "Ant Design, a design language for background applications, is refined by Ant UED Team.",
     content:
-      "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently."
+      "Ant Design, a design language for background applications, is refined by Ant UED Team.",
+    description:
+      "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.",
+    href: "http://ant.design",
+    title: `ant design part ${i}`
   });
 }
-const IconText = ({ type, text }) => (
-  <span>
-    <Icon type={type} style={{ marginRight: 8 }} />
-    {text}
-  </span>
-);

@@ -1,13 +1,12 @@
 import * as React from "react";
 import "./App.css";
 import { Layout, Menu, Icon, Avatar, Dropdown } from "antd";
-import * as router from "react-router-dom";
+import { Route, Link } from "react-router-dom";
 import { LoginWindow } from "./LoginWindow";
-import { Item } from "./Item";
+import { MainPage } from "./MainPage";
 import { ShoppingCartAffix } from "./ShoppingCart";
-
+import { UserCenter } from "./UserCenter";
 const { Header, Footer, Sider, Content } = Layout;
-const { SubMenu } = Menu;
 
 class App extends React.Component {
   state = {
@@ -25,6 +24,9 @@ class App extends React.Component {
     <Menu>
       <Menu.Item style={{ width: "120px", textAlign: "center" }}>
         <a onClick={this.loginWindowOpen}>登陆</a>
+      </Menu.Item>
+      <Menu.Item style={{ width: "120px", textAlign: "center" }}>
+        <Link to="/userCenter">个人中心</Link>
       </Menu.Item>
     </Menu>
   );
@@ -45,28 +47,34 @@ class App extends React.Component {
               background: "#FFFFFF"
             }}
           >
-            <div
-              className="logo"
-              style={{ float: "left", display: "inline-block" }}
-            >
-              <Icon
-                type="shopping-cart"
-                style={{
-                  marginRight: "24px",
-                  fontSize: "24px",
-                  display: "inline"
-                }}
-              />
+            <Link to="/">
               <div
+                className="logo"
                 style={{
-                  marginRight: "24px",
-                  fontSize: "24px",
-                  display: "inline"
+                  float: "left",
+                  display: "inline-block",
+                  color: "#000000"
                 }}
               >
-                生鲜商店
+                <Icon
+                  type="shopping-cart"
+                  style={{
+                    marginRight: "24px",
+                    fontSize: "24px",
+                    display: "inline"
+                  }}
+                />
+                <div
+                  style={{
+                    marginRight: "24px",
+                    fontSize: "24px",
+                    display: "inline"
+                  }}
+                >
+                  生鲜商店
+                </div>
               </div>
-            </div>
+            </Link>
             <div style={{ float: "right" }}>
               <Dropdown overlay={this.menu}>
                 <Avatar size={40} icon="user" style={{ marginRight: "12px" }} />
@@ -88,60 +96,10 @@ class App extends React.Component {
               marginRight: "auto"
             }}
           >
-            <Layout style={{ padding: "24px 0", background: "#fff" }}>
-              <Sider width={200} style={{ background: "#fff" }}>
-                <Menu
-                  mode="inline"
-                  defaultSelectedKeys={["1"]}
-                  defaultOpenKeys={["sub1"]}
-                  style={{ height: "100%" }}
-                >
-                  <Menu.Item key="1">新鲜水果</Menu.Item>
-                  <Menu.Item key="2">时令蔬菜</Menu.Item>
-                  <Menu.Item key="3">海鲜水产</Menu.Item>
-                  <Menu.Item key="4">肉禽蛋品</Menu.Item>
-                </Menu>
-              </Sider>
-              <Content style={{ padding: "0 24px", minHeight: 280 }}>
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>{" "}
-                <div style={{ float: "left", margin: "20px 20px 20px 20px" }}>
-                  <Item />
-                </div>
-              </Content>
-            </Layout>
+            <Route exact path="/" component={MainPage} />
+            <Route path="/userCenter" component={UserCenter} />
           </Content>
-          <Footer style={{ textAlign: "center" }}>
-            <ShoppingCartAffix />
-          </Footer>
+          <Footer style={{ textAlign: "center" }} />
         </Layout>
       </div>
     );
