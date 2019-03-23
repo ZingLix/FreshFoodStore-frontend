@@ -6,6 +6,7 @@ import { LoginWindow } from "./LoginWindow";
 import { MainPage } from "./MainPage";
 import { ShoppingCartAffix } from "./ShoppingCart";
 import { UserCenter } from "./UserCenter";
+import { ProductPage } from "./ProductPage";
 const { Header, Footer, Sider, Content } = Layout;
 
 class App extends React.Component {
@@ -98,6 +99,7 @@ class App extends React.Component {
           >
             <Route exact path="/" component={MainPage} />
             <Route path="/userCenter" component={UserCenter} />
+            <Route path="/product/:id" component={ProductPage} />
           </Content>
           <Footer style={{ textAlign: "center" }} />
         </Layout>

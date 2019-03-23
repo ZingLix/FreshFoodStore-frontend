@@ -1,9 +1,19 @@
 import * as React from "react";
 import { Card, Icon, Avatar } from "antd";
+import { Link } from "react-router-dom";
 
 const { Meta } = Card;
 
-export class Item extends React.Component {
+interface itemProps {
+  data: {
+    id: number;
+    name: string;
+    unit: string;
+    minprice: number;
+    img: string;
+  };
+}
+export class Item extends React.Component<itemProps, {}> {
   constructor(props) {
     super(props);
   }
@@ -13,18 +23,28 @@ export class Item extends React.Component {
       <Card
         style={{ width: 300 }}
         cover={
-          <img
-            alt="example"
-            src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-          />
+          <Link to={"/product/" + this.props.data.id}>
+            <img
+              alt="example"
+              src={"/img/" + this.props.data.img}
+              style={{ width: "100%", height: 300 }}
+            />
+          </Link>
         }
         actions={[
-          <Icon type="share-alt" />,
           <Icon type="star" />,
+          <Link to={"/product/" + this.props.data.id}>
+            <Icon type="ellipsis" />
+          </Link>,
           <Icon type="shopping-cart" />
         ]}
       >
-        <Meta title="番茄" description="3.3/斤" />
+        <Meta
+          title={this.props.data.name}
+          description={
+            this.props.data.minprice + "元/" + this.props.data.unit + " 起"
+          }
+        />
       </Card>
     );
   }
