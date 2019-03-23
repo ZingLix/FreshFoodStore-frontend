@@ -33,6 +33,46 @@ export class MainPage extends React.Component {
         unit: "斤",
         img: "test.png",
         category: 2
+      },
+      {
+        id: 3,
+        name: "黄瓜",
+        minprice: 4.6,
+        unit: "斤",
+        img: "test.png",
+        category: 2
+      },
+      {
+        id: 4,
+        name: "黄瓜",
+        minprice: 4.6,
+        unit: "斤",
+        img: "test.png",
+        category: 2
+      },
+      {
+        id: 5,
+        name: "黄瓜",
+        minprice: 4.6,
+        unit: "斤",
+        img: "test.png",
+        category: 2
+      },
+      {
+        id: 6,
+        name: "黄瓜",
+        minprice: 4.6,
+        unit: "斤",
+        img: "test.png",
+        category: 2
+      },
+      {
+        id: 7,
+        name: "黄瓜",
+        minprice: 4.6,
+        unit: "斤",
+        img: "test.png",
+        category: 2
       }
     ],
     currentCategory: 0
@@ -73,6 +113,7 @@ export class MainPage extends React.Component {
                       float: "left",
                       margin: "20px 20px 20px 20px"
                     }}
+                    key={c.id}
                   >
                     <Item data={c} />
                   </div>
