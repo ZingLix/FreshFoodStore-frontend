@@ -52,6 +52,8 @@ export class OrderInfomationList extends React.Component {
         </TabPane>
         <TabPane tab="已完成" key="3">
           <Order />
+          <Order />
+          <Order />
         </TabPane>
       </Tabs>
     );
@@ -129,7 +131,7 @@ export class Order extends React.Component {
       <Card
         title={this.state.date}
         extra={this.renderDeliveryInfo()}
-        style={{ width: "100%" }}
+        style={{ width: "100%", marginTop: "4px" }}
       >
         <List
           itemLayout="horizontal"

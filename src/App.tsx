@@ -7,6 +7,7 @@ import { MainPage } from "./MainPage";
 import { ShoppingCartAffix } from "./ShoppingCart";
 import { UserCenter } from "./UserCenter";
 import { ProductPage } from "./ProductPage";
+import { SellerCenter } from "./SellerCenter";
 const { Header, Footer, Sider, Content } = Layout;
 
 class App extends React.Component {
@@ -28,6 +29,9 @@ class App extends React.Component {
       </Menu.Item>
       <Menu.Item style={{ width: "120px", textAlign: "center" }}>
         <Link to="/userCenter">个人中心</Link>
+      </Menu.Item>
+      <Menu.Item style={{ width: "120px", textAlign: "center" }}>
+        <Link to="/sellerCenter">卖家中心</Link>
       </Menu.Item>
     </Menu>
   );
@@ -100,6 +104,7 @@ class App extends React.Component {
             <Route exact path="/" component={MainPage} />
             <Route path="/userCenter" component={UserCenter} />
             <Route path="/product/:id" component={ProductPage} />
+            <Route path="/sellerCenter" component={SellerCenter} />
           </Content>
           <Footer style={{ textAlign: "center" }} />
         </Layout>
