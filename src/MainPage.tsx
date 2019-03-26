@@ -12,10 +12,11 @@ export class MainPage extends React.Component {
 
   state = {
     productCategory: [
-      { id: 1, name: "新鲜水果" },
-      { id: 2, name: "时令蔬菜" },
-      { id: 3, name: "海鲜水产" },
-      { id: 4, name: "肉禽蛋品" }
+      { id: 0, typename: "全部" },
+      { id: 1, typename: "新鲜水果" },
+      { id: 2, typename: "时令蔬菜" },
+      { id: 3, typename: "海鲜水产" },
+      { id: 4, typename: "肉禽蛋品" }
     ],
     productList: [
       {
@@ -24,7 +25,7 @@ export class MainPage extends React.Component {
         minprice: 3.3,
         unit: "斤",
         img: "test.png",
-        category: 1
+        category_id: 1
       },
       {
         id: 2,
@@ -32,7 +33,7 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category: 2
+        category_id: 2
       },
       {
         id: 3,
@@ -40,7 +41,7 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category: 2
+        category_id: 2
       },
       {
         id: 4,
@@ -48,7 +49,7 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category: 2
+        category_id: 2
       },
       {
         id: 5,
@@ -56,7 +57,7 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category: 2
+        category_id: 2
       },
       {
         id: 6,
@@ -64,7 +65,7 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category: 2
+        category_id: 2
       },
       {
         id: 7,
@@ -72,7 +73,7 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category: 2
+        category_id: 2
       }
     ],
     currentCategory: 0
@@ -96,7 +97,7 @@ export class MainPage extends React.Component {
                     this.setState({ currentCategory: c.id });
                   }}
                 >
-                  {c.name}
+                  {c.typename}
                 </Menu.Item>
               ))}
             </Menu>
@@ -105,7 +106,7 @@ export class MainPage extends React.Component {
             {this.state.productList.map(c => {
               if (
                 this.state.currentCategory === 0 ||
-                c.category === this.state.currentCategory
+                c.category_id === this.state.currentCategory
               ) {
                 return (
                   <div

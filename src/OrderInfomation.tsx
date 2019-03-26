@@ -12,6 +12,7 @@ import {
   Timeline,
   Collapse
 } from "antd";
+import { number } from "prop-types";
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
@@ -26,68 +27,112 @@ const text = (
   </p>
 );
 
-export class OrderInfomationList extends React.Component {
-  state = {
-    current: "mail"
-  };
+export interface order {
+  id: number;
+  seller_id: number;
+  seller_name: string;
+  total_price: number;
+  status: number;
+  time: string;
+  address: string;
+  phone: string;
+  products: {
+    id: number;
+    img: string;
+    name: string;
+    unit: string;
+    price: number;
+    count: number;
+  }[];
+  delivery: {
+    time: string;
+    info: string;
+    status: number;
+  }[];
+}
 
-  callback = key => {
-    console.log(key);
+interface OrderInfo {
+  order: order;
+}
+
+export class OrderInfomationList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      current: "1",
+      orderList: [
+        {
+          id: 5497,
+          seller_id: 123,
+          seller_name: "卖家名",
+          total_price: 123,
+          status: 1,
+          time: "2019-3-20",
+          address: "地址",
+          phone: "13888888888",
+          products: [
+            {
+              id: 213,
+              img: "/",
+              name: "鱼",
+              unit: "条",
+              price: 123,
+              count: 3
+            }
+          ],
+          delivery: [
+            {
+              time: "2019-3-19 15:28:26",
+              info: "打包送出",
+              status: 1
+            },
+            {
+              time: "2019-3-19 19:38:41",
+              info: "抵达配送站",
+              status: 2
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  state: {
+    current: string;
+    orderList: order[];
   };
 
   handleClick = e => {
-    console.log("click ", e);
     this.setState({
       current: e.key
     });
   };
   public render() {
     return (
-      <Tabs defaultActiveKey="1" onChange={this.callback}>
-        <TabPane tab="配送中" key="1">
-          <Order />
+      <Tabs defaultActiveKey="1" onChange={this.handleClick}>
+        <TabPane tab="待付款" key="1">
+          <Order order={this.state.orderList[0]} />
         </TabPane>
-        <TabPane tab="待付款" key="2">
-          <Order />
+        <TabPane tab="待发货" key="2">
+          <Order order={this.state.orderList[0]} />
         </TabPane>
-        <TabPane tab="已完成" key="3">
-          <Order />
-          <Order />
-          <Order />
+        <TabPane tab="运输中" key="3">
+          <Order order={this.state.orderList[0]} />
+        </TabPane>
+        <TabPane tab="已完成" key="4">
+          <Order order={this.state.orderList[0]} />
+          <Order order={this.state.orderList[0]} />
+          <Order order={this.state.orderList[0]} />
         </TabPane>
       </Tabs>
     );
   }
 }
 
-export class Order extends React.Component {
-  state = {
-    date: "2019-3-20",
-    id: 54976513,
-    price: 123,
-    goods: [
-      {
-        img: "/",
-        name: "鱼",
-        id: 213,
-        count: 3,
-        price: 123,
-        unit: "条"
-      }
-    ],
-    delivery: [
-      {
-        seq: 1,
-        time: "2019-3-19 15:28:26",
-        msg: "打包送出"
-      },
-      {
-        seq: 2,
-        time: "2019-3-19 19:38:41",
-        msg: "抵达配送站"
-      }
-    ]
-  };
+export class Order extends React.Component<OrderInfo, {}> {
+  constructor(props) {
+    super(props);
+  }
 
   callback = key => {
     console.log(key);
@@ -103,11 +148,11 @@ export class Order extends React.Component {
   private diliveryTimeline() {
     return (
       <Timeline style={{ margin: "12px 12px 0px 12px" }}>
-        {this.state.delivery.map(d => (
-          <Timeline.Item key={d.seq} style={{ paddingBottom: "10px" }}>
+        {this.props.order.delivery.map(d => (
+          <Timeline.Item key={d.time} style={{ paddingBottom: "10px" }}>
             {d.time}
             <br />
-            {d.msg}
+            {d.info}
           </Timeline.Item>
         ))}
       </Timeline>
@@ -129,14 +174,14 @@ export class Order extends React.Component {
   public render() {
     return (
       <Card
-        title={this.state.date}
+        title={this.props.order.time}
         extra={this.renderDeliveryInfo()}
         style={{ width: "100%", marginTop: "4px" }}
       >
         <List
           itemLayout="horizontal"
-          key={this.state.id}
-          dataSource={this.state.goods}
+          key={this.props.order.id}
+          dataSource={this.props.order.products}
           renderItem={item => (
             <List.Item>
               <List.Item.Meta
@@ -150,7 +195,7 @@ export class Order extends React.Component {
           )}
         />
         <Title level={4} style={{ float: "right" }}>
-          合计：{this.state.price} 元
+          合计：{this.props.order.total_price} 元
         </Title>
       </Card>
     );

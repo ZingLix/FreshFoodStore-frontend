@@ -4,7 +4,7 @@ import { Layout, Menu, Icon, Avatar, Dropdown } from "antd";
 import { Route, Link } from "react-router-dom";
 import { LoginWindow } from "./LoginWindow";
 import { MainPage } from "./MainPage";
-import { ShoppingCartAffix } from "./ShoppingCart";
+import { BaseCenter } from "./BaseCenter";
 import { UserCenter } from "./UserCenter";
 import { ProductPage } from "./ProductPage";
 import { SellerCenter } from "./SellerCenter";
@@ -32,6 +32,9 @@ class App extends React.Component {
       </Menu.Item>
       <Menu.Item style={{ width: "120px", textAlign: "center" }}>
         <Link to="/sellerCenter">卖家中心</Link>
+      </Menu.Item>
+      <Menu.Item style={{ width: "120px", textAlign: "center" }}>
+        <Link to="/baseCenter">采买基地</Link>
       </Menu.Item>
     </Menu>
   );
@@ -105,6 +108,7 @@ class App extends React.Component {
             <Route path="/userCenter" component={UserCenter} />
             <Route path="/product/:id" component={ProductPage} />
             <Route path="/sellerCenter" component={SellerCenter} />
+            <Route path="/baseCenter" component={BaseCenter} />
           </Content>
           <Footer style={{ textAlign: "center" }} />
         </Layout>

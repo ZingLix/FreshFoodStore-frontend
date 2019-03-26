@@ -13,11 +13,11 @@ import {
   Affix,
   Tabs,
   Table,
-  Icon
+  InputNumber
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
-import { Order } from "./OrderInfomation";
+import { Order, order, OrderInfomationList } from "./OrderInfomation";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -66,19 +66,47 @@ class OrderList extends React.Component {
   constructor(props) {
     super(props);
   }
-  state = {
-    current: "mail",
-    waitingOrder: [],
-    deliveringOrder: [],
-    finishedOrder: []
+  state: {
+    current: string;
+    waitingOrder: order[];
+    deliveringOrder: order[];
+    finishedOrder: order[];
   };
 
-  callback = key => {
-    console.log(key);
+  testOrder = {
+    id: 5497,
+    seller_id: 123,
+    seller_name: "卖家名",
+    total_price: 123,
+    status: 1,
+    time: "2019-3-20",
+    address: "地址",
+    phone: "13888888888",
+    products: [
+      {
+        id: 213,
+        img: "/",
+        name: "鱼",
+        unit: "条",
+        price: 123,
+        count: 3
+      }
+    ],
+    delivery: [
+      {
+        time: "2019-3-19 15:28:26",
+        info: "打包送出",
+        status: 1
+      },
+      {
+        time: "2019-3-19 19:38:41",
+        info: "抵达配送站",
+        status: 2
+      }
+    ]
   };
 
   handleClick = e => {
-    console.log("click ", e);
     this.setState({
       current: e.key
     });
@@ -88,7 +116,7 @@ class OrderList extends React.Component {
     return (
       <Row gutter={24} type="flex" justify="center" align="middle">
         <Col span={21}>
-          <Order />
+          <Order order={this.testOrder} />
         </Col>
         <Col span={3}>
           <Button>发货</Button>
@@ -101,7 +129,7 @@ class OrderList extends React.Component {
     return (
       <Row gutter={24} type="flex" justify="center" align="middle">
         <Col span={21}>
-          <Order />
+          <Order order={this.testOrder} />
         </Col>
         <Col span={3}>
           <Button>更新物流</Button>
@@ -113,14 +141,14 @@ class OrderList extends React.Component {
     return (
       <Row gutter={24} type="flex" justify="center" align="middle">
         <Col span={24}>
-          <Order />
+          <Order order={this.testOrder} />
         </Col>
       </Row>
     );
   }
   public render() {
     return (
-      <Tabs defaultActiveKey="1" onChange={this.callback}>
+      <Tabs defaultActiveKey="1" onChange={this.handleClick}>
         <TabPane tab="待发货" key="1">
           {this.renderWaitingOrder()}
         </TabPane>
@@ -244,6 +272,7 @@ class Stock extends React.Component {
         price: 3.3,
         unit: "斤",
         img: "test.png",
+        count: 200,
         category: 1
       },
       {
@@ -252,6 +281,7 @@ class Stock extends React.Component {
         price: 4.6,
         unit: "斤",
         img: "test.png",
+        count: 300,
         category: 2
       }
     ]
@@ -260,8 +290,8 @@ class Stock extends React.Component {
   column = [
     {
       title: "货品",
-      dataIndex: "name",
-      key: "name"
+      key: "name",
+      render: item => <a href={"/product/" + item.id}>{item.name}</a>
     },
     {
       title: "单价",
@@ -273,11 +303,16 @@ class Stock extends React.Component {
       )
     },
     {
+      title: "余量",
+      dataIndex: "count"
+    },
+    {
       title: "操作",
       dataIndex: "operation",
       key: "operation",
       render: () => (
         <span className="table-operation">
+          <InputNumber style={{ marginRight: "10px" }} />
           <Button>进货</Button>
         </span>
       )
@@ -292,6 +327,12 @@ class Stock extends React.Component {
         rowKey={record => record.id.toString()}
       />
     );
+  }
+}
+
+class StockList extends React.Component {
+  public render() {
+    return <OrderInfomationList />;
   }
 }
 
@@ -321,6 +362,9 @@ export class SellerCenter extends React.Component {
               <Menu.Item key="4">
                 <Link to="/sellerCenter/stock">进货</Link>
               </Menu.Item>
+              <Menu.Item key="5">
+                <Link to="/sellerCenter/stockList">进货管理</Link>
+              </Menu.Item>
             </Menu>
           </Affix>
         </Sider>
@@ -331,6 +375,7 @@ export class SellerCenter extends React.Component {
           <Route path="/sellerCenter/productList" component={ProductList} />
           <Route path="/sellerCenter/order" component={OrderList} />
           <Route path="/sellerCenter/stock" component={Stock} />
+          <Route path="/sellerCenter/stockList" component={StockList} />
         </Content>
       </Layout>
     );

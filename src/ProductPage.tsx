@@ -3,6 +3,22 @@ import { Row, Col, Typography, List, Button } from "antd";
 
 const { Title } = Typography;
 
+interface ProductInfo {
+  id: number;
+  name: string;
+  unit: string;
+  img: string;
+}
+
+interface InventoryInfo {
+  id: number;
+  seller_id: number;
+  seller_name: string;
+  count: number;
+  price: number;
+  time: string;
+}
+
 interface props {
   id: number;
 }
@@ -10,33 +26,37 @@ interface props {
 export class ProductPage extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      product_info: {
+        id: 1,
+        name: "番茄",
+        unit: "斤",
+        img: "test.png"
+      },
+      inventory_list: [
+        {
+          id: 321,
+          seller_id: 1,
+          seller_name: "xx水果店",
+          price: 3.3,
+          count: 300,
+          time: "2019-3-18"
+        },
+        {
+          id: 123,
+          seller_id: 2,
+          seller_name: "xx超市",
+          price: 3.5,
+          count: 300,
+          time: "2019-3-19"
+        }
+      ]
+    };
   }
 
-  state = {
-    productInfo: {
-      name: "番茄",
-      description: "description",
-      unit: "斤",
-      img: "test.png"
-    },
-    merchantList: [
-      {
-        merchant_id: 1,
-        location: "XX路1号",
-        price: 3.3,
-        description: "123",
-        date: "2019-3-18",
-        record_id: 12
-      },
-      {
-        merchant_id: 2,
-        location: "XX路3号",
-        price: 3.5,
-        description: "321",
-        date: "2019-3-19",
-        record_id: 15
-      }
-    ]
+  state: {
+    product_info: ProductInfo;
+    inventory_list: InventoryInfo[];
   };
 
   public render() {
@@ -44,23 +64,23 @@ export class ProductPage extends React.Component {
       <Row gutter={24} style={{ padding: "24px 0", background: "#fff" }}>
         <Col span={8}>
           <img
-            src={"/img/" + this.state.productInfo.img}
+            src={"/img/" + this.state.product_info.img}
             style={{ width: "100%" }}
           />
         </Col>
         <Col span={16}>
-          <Title level={2}>{this.state.productInfo.name}</Title>
-          <Title level={4} style={{ marginTop: "3px" }}>
-            {this.state.productInfo.description}
-          </Title>
+          <Title level={2}>{this.state.product_info.name}</Title>
           <List
             itemLayout="horizontal"
-            dataSource={this.state.merchantList}
-            renderItem={item => (
+            dataSource={this.state.inventory_list}
+            renderItem={(item: InventoryInfo) => (
               <List.Item>
-                <List.Item.Meta title={item.location} description={item.date} />
+                <List.Item.Meta
+                  title={item.seller_name}
+                  description={item.time}
+                />
                 <div style={{ paddingRight: "10px" }}>
-                  {item.price} 元 / {this.state.productInfo.unit}
+                  {item.price} 元 / {this.state.product_info.unit}
                 </div>
                 <Button>添加到购物车</Button>
               </List.Item>
