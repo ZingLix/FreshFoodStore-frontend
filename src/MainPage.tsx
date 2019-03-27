@@ -41,7 +41,7 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category_id: 2
+        category_id: 3
       },
       {
         id: 4,
@@ -57,7 +57,23 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category_id: 2
+        category_id: 4
+      },
+      {
+        id: 9,
+        name: "黄瓜",
+        minprice: 4.6,
+        unit: "斤",
+        img: "test.png",
+        category_id: 4
+      },
+      {
+        id: 8,
+        name: "黄瓜",
+        minprice: 4.6,
+        unit: "斤",
+        img: "test.png",
+        category_id: 4
       },
       {
         id: 6,
@@ -65,7 +81,7 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category_id: 2
+        category_id: 4
       },
       {
         id: 7,
@@ -73,7 +89,15 @@ export class MainPage extends React.Component {
         minprice: 4.6,
         unit: "斤",
         img: "test.png",
-        category_id: 2
+        category_id: 3
+      },
+      {
+        id: 10,
+        name: "黄瓜",
+        minprice: 4.6,
+        unit: "斤",
+        img: "test.png",
+        category_id: 3
       }
     ],
     currentCategory: 0
