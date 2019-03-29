@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./App.css";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Affix } from "antd";
 import { Item } from "./Item";
 import { ShoppingCartAffix } from "./ShoppingCart";
 const { Header, Footer, Sider, Content } = Layout;
@@ -108,23 +108,25 @@ export class MainPage extends React.Component {
       <div>
         <Layout style={{ padding: "24px 0", background: "#fff" }}>
           <Sider width={200} style={{ background: "#fff" }}>
-            <Menu
-              mode="inline"
-              defaultSelectedKeys={["0"]}
-              defaultOpenKeys={["sub1"]}
-              style={{ height: "100%" }}
-            >
-              {this.state.productCategory.map(c => (
-                <Menu.Item
-                  key={c.id}
-                  onClick={() => {
-                    this.setState({ currentCategory: c.id });
-                  }}
-                >
-                  {c.typename}
-                </Menu.Item>
-              ))}
-            </Menu>
+            <Affix offsetTop={72}>
+              <Menu
+                mode="inline"
+                defaultSelectedKeys={["0"]}
+                defaultOpenKeys={["sub1"]}
+                style={{ height: "100%" }}
+              >
+                {this.state.productCategory.map(c => (
+                  <Menu.Item
+                    key={c.id}
+                    onClick={() => {
+                      this.setState({ currentCategory: c.id });
+                    }}
+                  >
+                    {c.typename}
+                  </Menu.Item>
+                ))}
+              </Menu>
+            </Affix>
           </Sider>
           <Content style={{ padding: "0 24px", minHeight: 280 }}>
             {this.state.productList.map(c => {

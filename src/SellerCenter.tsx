@@ -85,7 +85,7 @@ class OrderList extends React.Component {
     products: [
       {
         id: 213,
-        img: "/",
+        img: "fish.png",
         name: "鱼",
         unit: "条",
         price: 123,
@@ -205,7 +205,11 @@ class ProductList extends React.Component {
   };
 
   tableColumn = [
-    { title: "商品名", dataIndex: "name", key: "name" },
+    {
+      title: "商品名",
+      render: item => <a href={"/product/" + item.id}>{item.name}</a>,
+      key: "name"
+    },
     { title: "单位", dataIndex: "unit", key: "unit" }
   ];
   subTableColumn = [
@@ -230,7 +234,8 @@ class ProductList extends React.Component {
       key: "operation",
       render: () => (
         <span className="table-operation">
-          <Button>舍弃</Button>
+          <Button style={{ marginRight: "10px" }}>舍弃</Button>
+          <Button>调价</Button>
         </span>
       )
     }

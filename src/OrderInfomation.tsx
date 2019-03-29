@@ -73,7 +73,7 @@ export class OrderInfomationList extends React.Component {
           products: [
             {
               id: 213,
-              img: "/",
+              img: "fish.png",
               name: "鱼",
               unit: "条",
               price: 123,
@@ -185,7 +185,7 @@ export class Order extends React.Component<OrderInfo, {}> {
           renderItem={item => (
             <List.Item>
               <List.Item.Meta
-                avatar={<Avatar src={item.img} />}
+                avatar={<Avatar src={"/img/" + item.img} />}
                 title={item.name}
                 description={item.count + item.unit}
                 key={item.id}

@@ -13,7 +13,16 @@ import {
   Affix,
   Tabs,
   Table,
-  InputNumber
+  InputNumber,
+  Form,
+  Input,
+  Tooltip,
+  Icon,
+  Cascader,
+  Select,
+  Checkbox,
+  AutoComplete,
+  Modal
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
@@ -75,8 +84,8 @@ class Inventory extends React.Component {
       key: "operation",
       render: () => (
         <span className="table-operation">
-          <InputNumber style={{ marginRight: "10px" }} />
-          <Button>进货</Button>
+          <Button style={{ marginRight: "10px" }}>入库</Button>
+          <Button>调价</Button>
         </span>
       )
     }
@@ -89,6 +98,176 @@ class Inventory extends React.Component {
         columns={this.column}
         rowKey={record => record.id.toString()}
       />
+    );
+  }
+}
+
+class Product extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      category: {
+        0: "全部",
+        1: "新鲜水果",
+        2: "时令蔬菜",
+        3: "海鲜水产",
+        4: "肉禽蛋品"
+      },
+      products: [
+        {
+          id: 1,
+          name: "番茄",
+          unit: "斤",
+          img: "test.png",
+          category_id: 1
+        },
+        {
+          id: 2,
+          name: "黄瓜",
+          unit: "斤",
+          img: "test.png",
+          category_id: 2
+        }
+      ],
+      modal: false
+    };
+  }
+  state: {
+    products: {
+      id: number;
+      name: string;
+      unit: string;
+      category_id: number;
+      img: string;
+    }[];
+    category: {
+      [id: number]: string;
+    };
+    modal: boolean;
+  };
+  column = [
+    {
+      title: "示例图",
+      key: "img",
+      render: item => (
+        <img src={"/img/" + item.img} style={{ width: "100px" }} />
+      )
+    },
+    {
+      title: "名称",
+      key: "name",
+      dataIndex: "name"
+    },
+    {
+      title: "分类",
+      key: "category",
+      render: item => <div>{this.state.category[item.category_id]}</div>
+    },
+    {
+      title: "单位",
+      key: "unit",
+      dataIndex: "unit"
+    },
+    {
+      title: "操作",
+      dataIndex: "operation",
+      key: "operation",
+      render: () => (
+        <span className="table-operation">
+          <Button style={{ marginRight: "10px" }} onClick={this.showModal}>
+            修改信息
+          </Button>
+        </span>
+      )
+    }
+  ];
+  showModal = () => {
+    this.setState({
+      modal: true
+    });
+  };
+  hideModal = () => {
+    this.setState({
+      modal: false
+    });
+  };
+  public render() {
+    return (
+      <div>
+        <Modal
+          visible={this.state.modal}
+          title="货物信息"
+          onCancel={this.hideModal}
+        >
+          <ProductInfoForm />
+        </Modal>
+        <Button
+          type="primary"
+          style={{ marginBottom: "10px" }}
+          onClick={this.showModal}
+        >
+          新增
+        </Button>
+        <Table
+          dataSource={this.state.products}
+          rowKey={item => item.id.toString()}
+          columns={this.column}
+        />
+      </div>
+    );
+  }
+}
+
+class ProductInfoForm extends React.Component {
+  state = {
+    confirmDirty: false,
+    autoCompleteResult: []
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+  };
+
+  render() {
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 6 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 18 }
+      }
+    };
+    const tailFormItemLayout = {
+      wrapperCol: {
+        xs: {
+          span: 24,
+          offset: 0
+        },
+        sm: {
+          span: 16,
+          offset: 8
+        }
+      }
+    };
+
+    return (
+      <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+        <Form.Item label="名称">
+          <Input />
+        </Form.Item>
+        <Form.Item label="单位">
+          <Input />
+        </Form.Item>
+        <Form.Item label="分类">
+          <Input />
+        </Form.Item>
+
+        <Form.Item label="示例图">
+          <Input />
+        </Form.Item>
+      </Form>
     );
   }
 }
@@ -108,15 +287,19 @@ export class BaseCenter extends React.Component {
               defaultOpenKeys={["sub1"]}
             >
               <Menu.Item key="1">
-                <Link to="/baseCenter/inventory">库存管理</Link>
+                <Link to="/baseCenter">库存管理</Link>
+              </Menu.Item>
+              <Menu.Item key="2">
+                <Link to="/baseCenter/product">商品管理</Link>
               </Menu.Item>
             </Menu>
           </Affix>
         </Sider>
         <Content
-          style={{ padding: "0 24px", minHeight: 280, marginLeft: "16px" }}
+          style={{ padding: "44px 24px", minHeight: 280, marginLeft: "16px" }}
         >
-          <Inventory />
+          <Route exact path="/baseCenter" component={Inventory} />
+          <Route path="/baseCenter/product" component={Product} />
         </Content>
       </Layout>
     );
