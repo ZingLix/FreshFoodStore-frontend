@@ -181,7 +181,7 @@ class ShoppingCartItem extends React.Component<{ Item: entry }, {}> {
   public render() {
     return (
       <div>
-        <Title level={3}>{this.props.Item.seller_name}</Title>
+        <Title level={4}>{this.props.Item.seller_name}</Title>
         {this.props.Item.item.map(item => this.renderItem(item))}
       </div>
     );
@@ -197,7 +197,7 @@ export class ShoppingCartAffix extends React.Component {
       visible: false,
       shoppintcart: {
         1: {
-          seller_name: "xx水果店",
+          seller_name: "xx 水果店",
           item: [
             {
               id: 1,
@@ -211,7 +211,7 @@ export class ShoppingCartAffix extends React.Component {
           ]
         },
         2: {
-          seller_name: "xx超市",
+          seller_name: "xx 超市",
           item: [
             {
               id: 2,
