@@ -21,13 +21,13 @@ export class Item extends React.Component<itemProps, {}> {
   public render() {
     return (
       <Card
-        style={{ width: 300 }}
+        style={{ width: 250 }}
         cover={
           <Link to={"/product/" + this.props.data.id}>
             <img
               alt="example"
               src={"/img/" + this.props.data.img}
-              style={{ width: "100%", height: 300 }}
+              style={{ width: "100%", height: 250 }}
             />
           </Link>
         }

@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./App.css";
-import { Layout, Menu, Icon, Avatar, Dropdown } from "antd";
+import { Layout, Menu, Icon, Avatar, Dropdown, Popover, Input } from "antd";
 import { Route, Link } from "react-router-dom";
 import { LoginWindow } from "./LoginWindow";
 import { MainPage } from "./MainPage";
@@ -8,8 +8,9 @@ import { BaseCenter } from "./BaseCenter";
 import { UserCenter } from "./UserCenter";
 import { ProductPage } from "./ProductPage";
 import { SellerCenter } from "./SellerCenter";
+import { ShoppingCartAffix } from "./ShoppingCart";
 const { Header, Footer, Sider, Content } = Layout;
-
+const Search = Input.Search;
 class App extends React.Component {
   state = {
     loginWindow: {
@@ -37,6 +38,14 @@ class App extends React.Component {
         <Link to="/baseCenter">采买基地</Link>
       </Menu.Item>
     </Menu>
+  );
+
+  search = (
+    <Search
+      placeholder="input search text"
+      onSearch={value => console.log(value)}
+      enterButton
+    />
   );
 
   private loginWindow;
@@ -92,6 +101,26 @@ class App extends React.Component {
                   this.loginWindow = r;
                 }}
               />
+            </div>{" "}
+            <div
+              style={{
+                float: "right",
+                marginRight: "20px",
+                marginTop: "6px"
+              }}
+            >
+              <Popover content={this.search} placement="bottom">
+                <Icon type="search" style={{ fontSize: "24px" }} />
+              </Popover>
+            </div>
+            <div
+              style={{
+                float: "right",
+                marginRight: "20px",
+                marginTop: "6px"
+              }}
+            >
+              <Icon type="star" style={{ fontSize: "24px" }} />
             </div>
           </Header>
           <Content
@@ -109,6 +138,7 @@ class App extends React.Component {
             <Route path="/product/:id" component={ProductPage} />
             <Route path="/sellerCenter" component={SellerCenter} />
             <Route path="/baseCenter" component={BaseCenter} />
+            <ShoppingCartAffix />
           </Content>
           <Footer style={{ textAlign: "center" }} />
         </Layout>

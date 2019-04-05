@@ -14,7 +14,8 @@ import {
   Collapse,
   Table,
   Modal,
-  Statistic
+  Statistic,
+  Badge
 } from "antd";
 import "./App.css";
 
@@ -297,13 +298,15 @@ export class ShoppingCartAffix extends React.Component {
             }}
             onClick={this.showDrawer}
           >
-            <Icon
-              type="shopping-cart"
-              style={{
-                fontSize: "45px",
-                margin: "13px 10px 50px 8px"
-              }}
-            />
+            <Badge count={2}>
+              <Icon
+                type="shopping-cart"
+                style={{
+                  fontSize: "45px",
+                  margin: "13px 10px 50px 8px"
+                }}
+              />
+            </Badge>
           </Button>
         </Affix>
         <Drawer

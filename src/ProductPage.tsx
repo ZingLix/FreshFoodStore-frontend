@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Row, Col, Typography, List, Button } from "antd";
+import { Row, Col, Typography, List, Button, Breadcrumb, Icon } from "antd";
 
 const { Title } = Typography;
 
@@ -61,33 +61,46 @@ export class ProductPage extends React.Component {
 
   public render() {
     return (
-      <Row gutter={24} style={{ padding: "24px 0", background: "#fff" }}>
-        <Col span={8}>
-          <img
-            src={"/img/" + this.state.product_info.img}
-            style={{ width: "100%" }}
-          />
-        </Col>
-        <Col span={16}>
-          <Title level={2}>{this.state.product_info.name}</Title>
-          <List
-            itemLayout="horizontal"
-            dataSource={this.state.inventory_list}
-            renderItem={(item: InventoryInfo) => (
-              <List.Item>
-                <List.Item.Meta
-                  title={item.seller_name}
-                  description={item.time}
-                />
-                <div style={{ paddingRight: "10px" }}>
-                  {item.price} 元 / {this.state.product_info.unit}
-                </div>
-                <Button>添加到购物车</Button>
-              </List.Item>
-            )}
-          />
-        </Col>
-      </Row>
+      <div>
+        <Breadcrumb>
+          <Breadcrumb.Item href="/">
+            <Icon type="home" />
+          </Breadcrumb.Item>
+          <Breadcrumb.Item href="">
+            <span>时令蔬菜</span>
+          </Breadcrumb.Item>
+        </Breadcrumb>
+        <Row
+          gutter={24}
+          style={{ padding: "24px 0", background: "#fff", marginTop: "12px" }}
+        >
+          <Col span={8}>
+            <img
+              src={"/img/" + this.state.product_info.img}
+              style={{ width: "100%", padding: "20px" }}
+            />
+          </Col>
+          <Col span={16}>
+            <Title level={2}>{this.state.product_info.name}</Title>
+            <List
+              itemLayout="horizontal"
+              dataSource={this.state.inventory_list}
+              renderItem={(item: InventoryInfo) => (
+                <List.Item>
+                  <List.Item.Meta
+                    title={item.seller_name}
+                    description={item.time}
+                  />
+                  <div style={{ paddingRight: "10px" }}>
+                    {item.price} 元 / {this.state.product_info.unit}
+                  </div>
+                  <Button>添加到购物车</Button>
+                </List.Item>
+              )}
+            />
+          </Col>
+        </Row>
+      </div>
     );
   }
 }
