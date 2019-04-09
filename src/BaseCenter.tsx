@@ -38,77 +38,8 @@ interface product {
   unit: string;
   category_id: number;
   img: string;
-}
-
-class Inventory extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  state = {
-    productList: [
-      {
-        id: 1,
-        name: "番茄",
-        price: 3.3,
-        unit: "斤",
-        img: "test.png",
-        count: 200,
-        category: 1
-      },
-      {
-        id: 2,
-        name: "黄瓜",
-        price: 4.6,
-        unit: "斤",
-        img: "test.png",
-        count: 300,
-        category: 2
-      }
-    ]
-  };
-
-  column = [
-    {
-      title: "货品",
-      key: "name",
-      render: item => <a href={"/product/" + item.id}>{item.name}</a>
-    },
-    {
-      title: "单价",
-      key: "id",
-      render: item => (
-        <div key={item.id}>
-          {item.price}元/{item.unit}
-        </div>
-      )
-    },
-    {
-      title: "余量",
-      dataIndex: "count"
-    },
-    {
-      title: "操作",
-      dataIndex: "operation",
-      key: "operation",
-      render: () => (
-        <span className="table-operation">
-          <Button style={{ marginRight: "10px" }}>入库</Button>
-          <Button>调价</Button>
-        </span>
-      )
-    }
-  ];
-
-  public render() {
-    return (
-      <Table
-        dataSource={this.state.productList}
-        columns={this.column}
-        rowKey={record => record.id.toString()}
-      />
-    );
-  }
+  price: number;
+  count: number;
 }
 
 class Product extends React.Component {
@@ -152,6 +83,16 @@ class Product extends React.Component {
       dataIndex: "unit"
     },
     {
+      title: "价格",
+      key: "price",
+      dataIndex: "price"
+    },
+    {
+      title: "剩余数量",
+      key: "count",
+      dataIndex: "count"
+    },
+    {
       title: "操作",
       dataIndex: "operation",
       key: "operation",
@@ -182,7 +123,7 @@ class Product extends React.Component {
           category: tmp
         });
       });
-    fetch(baseUrl + "/api/products")
+    fetch(baseUrl + "/api/base/inventory")
       .then((Response: any) => Response.json())
       .then((r: any) => {
         this.setState({
@@ -255,7 +196,9 @@ class ProductInfoForm extends React.Component {
         name: "",
         unit: "",
         category_id: 0,
-        img: ""
+        img: "",
+        price: 0,
+        count: 0
       }
     };
   }
@@ -277,14 +220,16 @@ class ProductInfoForm extends React.Component {
         name: "",
         unit: "",
         category_id: 0,
-        img: ""
+        img: "",
+        price: 0,
+        count: 0
       }
     });
   }
 
   public submit() {
     if (this.state.productinfo.id == 0) {
-      fetch(baseUrl + "/api/products", {
+      fetch(baseUrl + "/api/base/inventory", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
@@ -293,7 +238,7 @@ class ProductInfoForm extends React.Component {
         body: JSON.stringify(this.state.productinfo)
       });
     } else {
-      fetch(baseUrl + "/api/products/" + this.state.productinfo.id, {
+      fetch(baseUrl + "/api/base/inventory/" + this.state.productinfo.id, {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
@@ -366,6 +311,30 @@ class ProductInfoForm extends React.Component {
             }}
           />
         </Form.Item>
+        <Form.Item label="价格">
+          <Input
+            value={this.state.productinfo.price}
+            onChange={e => {
+              var tmp = this.state.productinfo;
+              tmp.price = parseInt(e.target.value);
+              this.setState({
+                productinfo: tmp
+              });
+            }}
+          />
+        </Form.Item>
+        <Form.Item label="库存">
+          <Input
+            value={this.state.productinfo.count}
+            onChange={e => {
+              var tmp = this.state.productinfo;
+              tmp.count = parseInt(e.target.value);
+              this.setState({
+                productinfo: tmp
+              });
+            }}
+          />
+        </Form.Item>
       </Form>
     );
   }
@@ -388,17 +357,13 @@ export class BaseCenter extends React.Component {
               <Menu.Item key="1">
                 <Link to="/baseCenter">库存管理</Link>
               </Menu.Item>
-              <Menu.Item key="2">
-                <Link to="/baseCenter/product">商品管理</Link>
-              </Menu.Item>
             </Menu>
           </Affix>
         </Sider>
         <Content
           style={{ padding: "44px 24px", minHeight: 280, marginLeft: "16px" }}
         >
-          <Route exact path="/baseCenter" component={Inventory} />
-          <Route path="/baseCenter/product" component={Product} />
+          <Route exact path="/baseCenter" component={Product} />
         </Content>
       </Layout>
     );

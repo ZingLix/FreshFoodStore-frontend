@@ -18,6 +18,7 @@ import {
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { Order, order, OrderInfomationList } from "./OrderInfomation";
+import { baseUrl } from "./Setting";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -267,30 +268,31 @@ class ProductList extends React.Component {
 class Stock extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      productList: []
+    };
   }
 
-  state = {
-    productList: [
-      {
-        id: 1,
-        name: "番茄",
-        price: 3.3,
-        unit: "斤",
-        img: "test.png",
-        count: 200,
-        category: 1
-      },
-      {
-        id: 2,
-        name: "黄瓜",
-        price: 4.6,
-        unit: "斤",
-        img: "test.png",
-        count: 300,
-        category: 2
-      }
-    ]
+  state: {
+    productList: {
+      id: number;
+      name: string;
+      unit: string;
+      category_id: number;
+      img: string;
+      price: number;
+      count: number;
+    }[];
   };
+  componentWillMount() {
+    fetch(baseUrl + "/api/seller/baseProducts")
+      .then(response => response.json())
+      .then(r => {
+        this.setState({
+          productList: r
+        });
+      });
+  }
 
   column = [
     {
