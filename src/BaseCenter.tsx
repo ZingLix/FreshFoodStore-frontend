@@ -159,7 +159,7 @@ class Product extends React.Component {
         <span className="table-operation">
           <Button
             style={{ marginRight: "10px" }}
-            onClick={() => this.showModalwithProduct(index)}
+            onClick={() => this.showModalwithProduct(record)}
           >
             修改信息
           </Button>
@@ -208,9 +208,9 @@ class Product extends React.Component {
     this.hideModal();
   };
 
-  showModalwithProduct = idx => {
+  showModalwithProduct = product => {
     this.showModal();
-    this.form.setProduct(this.state.products[idx]);
+    this.form.setProduct(product);
   };
 
   public render() {
