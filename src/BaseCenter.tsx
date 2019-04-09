@@ -27,9 +27,18 @@ import {
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { Order, order, OrderInfomationList } from "./OrderInfomation";
+import { baseUrl } from "./Setting";
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const TabPane = Tabs.TabPane;
+
+interface product {
+  id: number;
+  name: string;
+  unit: string;
+  category_id: number;
+  img: string;
+}
 
 class Inventory extends React.Component {
   constructor(props) {
@@ -106,40 +115,14 @@ class Product extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      category: {
-        0: "全部",
-        1: "新鲜水果",
-        2: "时令蔬菜",
-        3: "海鲜水产",
-        4: "肉禽蛋品"
-      },
-      products: [
-        {
-          id: 1,
-          name: "番茄",
-          unit: "斤",
-          img: "test.png",
-          category_id: 1
-        },
-        {
-          id: 2,
-          name: "黄瓜",
-          unit: "斤",
-          img: "test.png",
-          category_id: 2
-        }
-      ],
+      category: {},
+      products: [],
       modal: false
     };
   }
+
   state: {
-    products: {
-      id: number;
-      name: string;
-      unit: string;
-      category_id: number;
-      img: string;
-    }[];
+    products: product[];
     category: {
       [id: number]: string;
     };
@@ -172,25 +155,64 @@ class Product extends React.Component {
       title: "操作",
       dataIndex: "operation",
       key: "operation",
-      render: () => (
+      render: (text, record, index) => (
         <span className="table-operation">
-          <Button style={{ marginRight: "10px" }} onClick={this.showModal}>
+          <Button
+            style={{ marginRight: "10px" }}
+            onClick={() => this.showModalwithProduct(index)}
+          >
             修改信息
           </Button>
         </span>
       )
     }
   ];
+
+  private form;
+
+  componentWillMount() {
+    fetch(baseUrl + "/api/products/category")
+      .then((response: any) => response.json())
+      .then((d: any) => {
+        var tmp = {};
+        d.forEach(element => {
+          tmp[element.id] = element.typename;
+        });
+        this.setState({
+          category: tmp
+        });
+      });
+    fetch(baseUrl + "/api/products")
+      .then((Response: any) => Response.json())
+      .then((r: any) => {
+        this.setState({
+          products: r
+        });
+      });
+  }
+
   showModal = () => {
     this.setState({
       modal: true
     });
   };
+
   hideModal = () => {
     this.setState({
       modal: false
     });
   };
+
+  submitProduct = () => {
+    this.form.submit();
+    this.hideModal();
+  };
+
+  showModalwithProduct = idx => {
+    this.showModal();
+    this.form.setProduct(this.state.products[idx]);
+  };
+
   public render() {
     return (
       <div>
@@ -198,13 +220,18 @@ class Product extends React.Component {
           visible={this.state.modal}
           title="货物信息"
           onCancel={this.hideModal}
+          onOk={this.submitProduct}
+          forceRender
         >
-          <ProductInfoForm />
+          <ProductInfoForm ref={comp => (this.form = comp)} />
         </Modal>
         <Button
           type="primary"
           style={{ marginBottom: "10px" }}
-          onClick={this.showModal}
+          onClick={() => {
+            this.form.clearProduct();
+            this.showModal();
+          }}
         >
           新增
         </Button>
@@ -219,14 +246,63 @@ class Product extends React.Component {
 }
 
 class ProductInfoForm extends React.Component {
-  state = {
-    confirmDirty: false,
-    autoCompleteResult: []
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      productinfo: {
+        id: 0,
+        name: "",
+        unit: "",
+        category_id: 0,
+        img: ""
+      }
+    };
+  }
+
+  state: {
+    productinfo: product;
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-  };
+  public setProduct(p: product) {
+    this.setState({
+      productinfo: p
+    });
+  }
+
+  public clearProduct() {
+    this.setState({
+      productinfo: {
+        id: 0,
+        name: "",
+        unit: "",
+        category_id: 0,
+        img: ""
+      }
+    });
+  }
+
+  public submit() {
+    if (this.state.productinfo.id == 0) {
+      fetch(baseUrl + "/api/products", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(this.state.productinfo)
+      });
+    } else {
+      fetch(baseUrl + "/api/products/" + this.state.productinfo.id, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "PUT",
+        body: JSON.stringify(this.state.productinfo)
+      });
+    }
+  }
 
   render() {
     const formItemLayout = {
@@ -239,33 +315,56 @@ class ProductInfoForm extends React.Component {
         sm: { span: 18 }
       }
     };
-    const tailFormItemLayout = {
-      wrapperCol: {
-        xs: {
-          span: 24,
-          offset: 0
-        },
-        sm: {
-          span: 16,
-          offset: 8
-        }
-      }
-    };
 
     return (
-      <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+      <Form {...formItemLayout}>
         <Form.Item label="名称">
-          <Input />
+          <Input
+            value={this.state.productinfo.name}
+            onChange={e => {
+              var tmp = this.state.productinfo;
+              tmp.name = e.target.value;
+              this.setState({
+                productinfo: tmp
+              });
+            }}
+          />
         </Form.Item>
         <Form.Item label="单位">
-          <Input />
+          <Input
+            value={this.state.productinfo.unit}
+            onChange={e => {
+              var tmp = this.state.productinfo;
+              tmp.unit = e.target.value;
+              this.setState({
+                productinfo: tmp
+              });
+            }}
+          />
         </Form.Item>
         <Form.Item label="分类">
-          <Input />
+          <Input
+            value={this.state.productinfo.category_id}
+            onChange={e => {
+              var tmp = this.state.productinfo;
+              tmp.category_id = parseInt(e.target.value);
+              this.setState({
+                productinfo: tmp
+              });
+            }}
+          />
         </Form.Item>
-
         <Form.Item label="示例图">
-          <Input />
+          <Input
+            value={this.state.productinfo.img}
+            onChange={e => {
+              var tmp = this.state.productinfo;
+              tmp.img = e.target.value;
+              this.setState({
+                productinfo: tmp
+              });
+            }}
+          />
         </Form.Item>
       </Form>
     );

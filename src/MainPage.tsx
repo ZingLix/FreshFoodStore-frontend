@@ -3,19 +3,15 @@ import "./App.css";
 import { Layout, Menu, Affix } from "antd";
 import { Item } from "./Item";
 import { ShoppingCartAffix } from "./ShoppingCart";
+import { baseUrl } from "./Setting";
+
 const { Header, Footer, Sider, Content } = Layout;
 
 export class MainPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      productCategory: [
-        { id: 0, typename: "全部" },
-        { id: 1, typename: "新鲜水果" },
-        { id: 2, typename: "时令蔬菜" },
-        { id: 3, typename: "海鲜水产" },
-        { id: 4, typename: "肉禽蛋品" }
-      ],
+      productCategory: [],
       productList: [
         {
           id: 1,
@@ -103,7 +99,7 @@ export class MainPage extends React.Component {
   }
 
   componentWillMount() {
-    fetch("http://127.0.0.1:8080/api/products/category")
+    fetch(baseUrl + "/api/products/category")
       .then((response: any) => response.json())
       .then((d: any) => {
         this.setState({
