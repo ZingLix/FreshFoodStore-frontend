@@ -21,13 +21,14 @@ import {
   Cascader,
   Select,
   Checkbox,
-  AutoComplete,
+  Tag,
   Modal
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { Order, order, OrderInfomationList } from "./OrderInfomation";
 import { baseUrl } from "./Setting";
+import { TweenOneGroup } from 'rc-tween-one';
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const TabPane = Tabs.TabPane;
@@ -340,6 +341,133 @@ class ProductInfoForm extends React.Component {
   }
 }
 
+class Category extends React.Component{
+  constructor(props){
+    super(props)
+    this.state = {
+      category:[],
+      inputVisible: false,
+      inputValue: '',
+    };
+  }
+
+
+  state:{
+    category:{
+      id:number,
+      typename:string
+    }[],
+    inputVisible:false,
+    inputValue:string
+  }
+  input
+
+componentWillMount(){
+  this.getCategory();
+}
+
+  showInput = () => {
+    this.setState({ inputVisible: true }, () => this.input.focus());
+  }
+
+  saveInputRef = input => this.input = input
+
+  handleInputChange = (e) => {
+    this.setState({ inputValue: e.target.value });
+  }
+
+  handleInputConfirm=()=>{
+    if(this.state.inputValue!=""){
+      fetch(baseUrl+ "/api/products/category",{
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify({typename:this.state.inputValue})
+      })
+      .then(res=>res.json())
+      .then(res=>{
+        var tmp=this.state.category
+        tmp.push(res)
+        this.setState({
+          category:tmp
+        })
+       } )
+      
+    }
+   
+    this.setState({
+      inputValue:"",
+      inputVisible:false
+    })
+  }
+
+  getCategory(){
+    fetch(baseUrl+ "/api/products/category")
+    .then((response: any) => response.json())
+    .then(r=>{
+      this.setState(
+        {
+          category:r
+        }
+      )
+    })
+  }
+
+  deleteCategory(id){
+    fetch(baseUrl+ "/api/products/category/"+id,{
+      method:"DELETE"
+    })
+  }
+  forMap = (c) => {
+    const tagElem = (
+      <Tag 
+      closable
+      
+      onClose={()=>this.deleteCategory(c.id)}
+     
+    >
+      {c.typename}
+    </Tag>
+    );
+    return (
+      <span key={c.id} style={{ display: 'inline-block',marginBottom:"6px" }}>
+        {tagElem}
+      </span>
+    );
+  }
+  public render(){
+    const { inputVisible, inputValue } = this.state;
+    const tagChild = this.state.category.map(this.forMap);
+    return(
+      <div>
+        <Row>        {inputVisible && (
+          <Input
+            ref={this.saveInputRef}
+            type="text"
+            size="small"
+            style={{ width: 78 }}
+             value={inputValue}
+             onChange={this.handleInputChange}
+             onBlur={this.handleInputConfirm}
+             onPressEnter={this.handleInputConfirm}
+          />
+        )}
+        {!inputVisible && (
+          <Tag
+            onClick={this.showInput}
+            style={{ background: '#fff', borderStyle: 'dashed' }}
+          >
+            <Icon type="plus" /> 添加分类
+          </Tag>
+        )}</Row>
+<Row style={{marginTop:"10px"}}>
+       { tagChild} </Row></div>
+    )
+  }
+}
+
 export class BaseCenter extends React.Component {
   public render() {
     return (
@@ -356,7 +484,12 @@ export class BaseCenter extends React.Component {
             >
               <Menu.Item key="1">
                 <Link to="/baseCenter">库存管理</Link>
+                
+              </Menu.Item><Menu.Item key="2">
+              <Link to="/baseCenter/category">产品分类</Link>
+                
               </Menu.Item>
+              
             </Menu>
           </Affix>
         </Sider>
@@ -364,6 +497,7 @@ export class BaseCenter extends React.Component {
           style={{ padding: "44px 24px", minHeight: 280, marginLeft: "16px" }}
         >
           <Route exact path="/baseCenter" component={Product} />
+          <Route exact path="/baseCenter/category" component={Category} />
         </Content>
       </Layout>
     );

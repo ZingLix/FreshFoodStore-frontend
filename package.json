@@ -5,6 +5,7 @@
   "dependencies": {
     "@types/react-router-dom": "^4.3.1",
     "antd": "^3.15.1",
+    "rc-tween-one": "^2.4.0",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-router-dom": "^5.0.0",
