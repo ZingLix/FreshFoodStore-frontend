@@ -8,11 +8,12 @@ import {
   Select,
   Row,
   Col,
-  Checkbox,
+  message,
   Button,
   AutoComplete
 } from "antd";
 import { WrappedFormUtils } from "antd/lib/form/Form";
+import { baseUrl } from "./Setting";
 
 const { Option } = Select;
 const AutoCompleteOption = AutoComplete.Option;
@@ -60,13 +61,41 @@ class UserInfoForm extends React.Component<Props, {}> {
     autoCompleteResult: []
   };
 
+  componentDidMount() {
+    var id = localStorage.getItem("user_id");
+    if (id == null) message.error("请重新登录");
+    else
+      fetch(baseUrl + "/api/user/" + id + "/info")
+        .then(r => {
+          return r.json();
+        })
+        .then(info => {
+          delete info.id;
+          this.props.form.setFieldsValue(info);
+        });
+  }
+
   handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        console.log("Received values of form: ", values);
-      }
-    });
+    var id = localStorage.getItem("user_id");
+    if (id == null) message.error("请重新登录");
+    else {
+      const form = this.props.form;
+      var reqbody = {
+        email: form.getFieldValue("email"),
+        address: form.getFieldValue("address"),
+        nickname: form.getFieldValue("nickname"),
+        phone: form.getFieldValue("phone")
+      };
+      fetch(baseUrl + "/api/user/" + id + "/info", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(reqbody)
+      }).then(message.success("已修改"));
+    }
   };
 
   handleConfirmBlur = e => {
@@ -74,35 +103,6 @@ class UserInfoForm extends React.Component<Props, {}> {
     this.setState({
       confirmDirty: this.state.confirmDirty || !!value
     });
-  };
-
-  compareToFirstPassword = (rule, value, callback) => {
-    const form = this.props.form;
-    if (value && value !== form.getFieldValue("password")) {
-      callback("Two passwords that you enter is inconsistent!");
-    } else {
-      callback();
-    }
-  };
-
-  validateToNextPassword = (rule, value, callback) => {
-    const form = this.props.form;
-    if (value && this.state.confirmDirty) {
-      form.validateFields(["confirm"], { force: true });
-    }
-    callback();
-  };
-
-  handleWebsiteChange = value => {
-    let autoCompleteResult;
-    if (!value) {
-      autoCompleteResult = [];
-    } else {
-      autoCompleteResult = [".com", ".org", ".net"].map(
-        domain => `${value}${domain}`
-      );
-    }
-    this.setState({ autoCompleteResult });
   };
 
   render() {
@@ -136,7 +136,6 @@ class UserInfoForm extends React.Component<Props, {}> {
     })(
       <Select style={{ width: 70 }}>
         <Option value="86">+86</Option>
-        <Option value="87">+87</Option>
       </Select>
     );
 
@@ -149,10 +148,6 @@ class UserInfoForm extends React.Component<Props, {}> {
         <Form.Item label="邮箱" labelCol={{ span: 3 }}>
           {getFieldDecorator("email", {
             rules: [
-              {
-                type: "email",
-                message: "The input is not valid E-mail!"
-              },
               {
                 required: true,
                 message: "Please input your E-mail!"
@@ -172,25 +167,13 @@ class UserInfoForm extends React.Component<Props, {}> {
           labelCol={{ span: 3 }}
         >
           {getFieldDecorator("nickname", {
-            rules: [
-              {
-                required: true,
-                message: "Please input your nickname!",
-                whitespace: true
-              }
-            ]
+            rules: []
           })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
         </Form.Item>
         <Form.Item label="地址" labelCol={{ span: 3 }}>
           {getFieldDecorator("residence", {
             initialValue: ["zhejiang", "hangzhou", "xihu"],
-            rules: [
-              {
-                type: "array",
-                required: true,
-                message: "Please select your habitual residence!"
-              }
-            ]
+            rules: []
           })(
             <Cascader
               options={residences}
@@ -199,23 +182,13 @@ class UserInfoForm extends React.Component<Props, {}> {
           )}
         </Form.Item>
         <Form.Item label="详细地址" labelCol={{ span: 3 }}>
-          {getFieldDecorator("detailAddress", {
-            rules: [
-              {
-                required: true,
-                message: "Please input your adddress!"
-              }
-            ]
+          {getFieldDecorator("address", {
+            rules: []
           })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
         </Form.Item>
         <Form.Item label="电话" labelCol={{ span: 3 }}>
           {getFieldDecorator("phone", {
-            rules: [
-              {
-                required: true,
-                message: "Please input your phone number!"
-              }
-            ]
+            rules: []
           })(
             <Input
               addonBefore={prefixSelector}

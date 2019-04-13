@@ -9,8 +9,10 @@ import { UserCenter } from "./UserCenter";
 import { ProductPage } from "./ProductPage";
 import { SellerCenter } from "./SellerCenter";
 import { ShoppingCartAffix } from "./ShoppingCart";
+
 const { Header, Footer, Sider, Content } = Layout;
 const Search = Input.Search;
+
 class App extends React.Component {
   state = {
     loginWindow: {

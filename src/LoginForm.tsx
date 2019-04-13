@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Form, Icon, Input, Button, Checkbox } from "antd";
+import { Form, Icon, Input, Button, Checkbox, message } from "antd";
 import { WrappedFormUtils } from "antd/lib/form/Form";
 import "./App.css";
+import { baseUrl } from "./Setting";
 
 interface Props {
   form: WrappedFormUtils;
@@ -12,16 +13,61 @@ function hasErrors(fieldsError) {
 }
 
 class HorizontalLoginForm extends React.Component<Props, {}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      request: {
+        username: "",
+        password: ""
+      }
+    };
+  }
+
+  state: {
+    request: {
+      username: string;
+      password: string;
+    };
+  };
+
   componentDidMount() {
     // To disabled submit button at the beginning.
     //this.props.form.validateFields();
   }
 
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        console.log("Received values of form: ", values);
+  login = e => {
+    fetch(baseUrl + "/api/user/login", {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(this.state.request)
+    }).then(response => {
+      if (response.status == 200) {
+        response.json().then(r => {
+          message.success("登录成功" + r.id);
+          localStorage.setItem("user_id", r.id);
+        });
+      } else {
+        response.json().then(r => message.error(r.msg));
+      }
+    });
+  };
+
+  register = e => {
+    fetch(baseUrl + "/api/user", {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(this.state.request)
+    }).then(response => {
+      if (response.status == 200) {
+        var j = response.json().then(r => message.success(r.msg));
+      } else {
+        message.error(response.json().then(r => r.msg));
       }
     });
   };
@@ -40,27 +86,35 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
     const passwordError =
       isFieldTouched("password") && getFieldError("password");
     return (
-      <Form onSubmit={this.handleSubmit} className="login-form">
+      <Form onSubmit={this.login} className="login-form">
         <Form.Item>
-          {getFieldDecorator("userName", {
-            rules: [{ required: true, message: "Please input your username!" }]
-          })(
-            <Input
-              prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
-              placeholder="用户名"
-            />
-          )}
+          <Input
+            value={this.state.request.username}
+            onChange={e => {
+              var tmp = this.state.request;
+              tmp.username = e.target.value;
+              this.setState({
+                product: tmp
+              });
+            }}
+            prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
+            placeholder="用户名"
+          />
         </Form.Item>
         <Form.Item>
-          {getFieldDecorator("password", {
-            rules: [{ required: true, message: "Please input your Password!" }]
-          })(
-            <Input
-              prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />}
-              type="password"
-              placeholder="密码"
-            />
-          )}
+          <Input
+            value={this.state.request.password}
+            onChange={e => {
+              var tmp = this.state.request;
+              tmp.password = e.target.value;
+              this.setState({
+                product: tmp
+              });
+            }}
+            prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />}
+            type="password"
+            placeholder="密码"
+          />
         </Form.Item>
         <Form.Item>
           {getFieldDecorator("remember", {
@@ -70,15 +124,10 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
           <a className="login-form-forgot" href="" style={{ float: "right" }}>
             忘记密码
           </a>
-          <Button
-            type="primary"
-            htmlType="submit"
-            className="login-form-button"
-            style={{ width: "100%" }}
-          >
+          <Button type="primary" onClick={this.login} style={{ width: "100%" }}>
             登陆
           </Button>
-          或者 <a href="">立即注册!</a>
+          或者 <Button onClick={this.register}>立即注册!</Button>
         </Form.Item>
       </Form>
     );

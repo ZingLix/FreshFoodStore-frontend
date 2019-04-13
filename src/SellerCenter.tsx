@@ -13,7 +13,8 @@ import {
   Affix,
   Tabs,
   Table,
-  InputNumber
+  InputNumber,
+  message
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
@@ -265,6 +266,55 @@ class ProductList extends React.Component {
   }
 }
 
+class StockButton extends React.Component<{ Productid: number }, {}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      val: 0
+    };
+  }
+
+  state: {
+    val: number;
+  };
+
+  placeorder = () => {
+    var id = localStorage.getItem("user_id");
+    if (id == undefined) message.error("请重新登录");
+    else {
+      let list: any[] = [];
+      var tmp = {
+        id: this.props.Productid,
+        count: this.state.val
+      };
+      list.push(tmp);
+      fetch(baseUrl + "/api/seller/" + id + "/products", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(list)
+      })
+        .then(res => res.json())
+        .then(r => console.log(r));
+    }
+  };
+
+  render() {
+    return (
+      <span className="table-operation">
+        <InputNumber
+          value={this.state.val}
+          onChange={e => this.setState({ val: e })}
+          style={{ marginRight: "10px" }}
+        />
+        <Button onClick={this.placeorder}>进货</Button>
+      </span>
+    );
+  }
+}
+
 class Stock extends React.Component {
   constructor(props) {
     super(props);
@@ -317,12 +367,14 @@ class Stock extends React.Component {
       title: "操作",
       dataIndex: "operation",
       key: "operation",
-      render: () => (
-        <span className="table-operation">
-          <InputNumber style={{ marginRight: "10px" }} />
-          <Button>进货</Button>
-        </span>
-      )
+      render: (text, record, index) => {
+        let val: number | undefined = 0;
+        return (
+          <div>
+            <StockButton Productid={record.id} />
+          </div>
+        );
+      }
     }
   ];
 

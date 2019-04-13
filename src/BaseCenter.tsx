@@ -28,7 +28,7 @@ import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { Order, order, OrderInfomationList } from "./OrderInfomation";
 import { baseUrl } from "./Setting";
-import { TweenOneGroup } from 'rc-tween-one';
+import Column from "antd/lib/table/Column";
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const TabPane = Tabs.TabPane;
@@ -341,130 +341,251 @@ class ProductInfoForm extends React.Component {
   }
 }
 
-class Category extends React.Component{
-  constructor(props){
-    super(props)
+class Category extends React.Component {
+  constructor(props) {
+    super(props);
     this.state = {
-      category:[],
+      category: [],
       inputVisible: false,
-      inputValue: '',
+      inputValue: ""
     };
   }
 
+  state: {
+    category: {
+      id: number;
+      typename: string;
+    }[];
+    inputVisible: false;
+    inputValue: string;
+  };
+  input;
 
-  state:{
-    category:{
-      id:number,
-      typename:string
-    }[],
-    inputVisible:false,
-    inputValue:string
+  componentWillMount() {
+    this.getCategory();
   }
-  input
-
-componentWillMount(){
-  this.getCategory();
-}
 
   showInput = () => {
     this.setState({ inputVisible: true }, () => this.input.focus());
-  }
+  };
 
-  saveInputRef = input => this.input = input
+  saveInputRef = input => (this.input = input);
 
-  handleInputChange = (e) => {
+  handleInputChange = e => {
     this.setState({ inputValue: e.target.value });
-  }
+  };
 
-  handleInputConfirm=()=>{
-    if(this.state.inputValue!=""){
-      fetch(baseUrl+ "/api/products/category",{
+  handleInputConfirm = () => {
+    if (this.state.inputValue != "") {
+      fetch(baseUrl + "/api/products/category", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
         },
         method: "POST",
-        body: JSON.stringify({typename:this.state.inputValue})
+        body: JSON.stringify({ typename: this.state.inputValue })
       })
-      .then(res=>res.json())
-      .then(res=>{
-        var tmp=this.state.category
-        tmp.push(res)
-        this.setState({
-          category:tmp
-        })
-       } )
-      
+        .then(res => res.json())
+        .then(res => {
+          var tmp = this.state.category;
+          tmp.push(res);
+          this.setState({
+            category: tmp
+          });
+        });
     }
-   
+
     this.setState({
-      inputValue:"",
-      inputVisible:false
-    })
+      inputValue: "",
+      inputVisible: false
+    });
+  };
+
+  getCategory() {
+    fetch(baseUrl + "/api/products/category")
+      .then((response: any) => response.json())
+      .then(r => {
+        this.setState({
+          category: r
+        });
+      });
   }
 
-  getCategory(){
-    fetch(baseUrl+ "/api/products/category")
-    .then((response: any) => response.json())
-    .then(r=>{
-      this.setState(
-        {
-          category:r
-        }
-      )
-    })
+  deleteCategory(id) {
+    fetch(baseUrl + "/api/products/category/" + id, {
+      method: "DELETE"
+    });
   }
-
-  deleteCategory(id){
-    fetch(baseUrl+ "/api/products/category/"+id,{
-      method:"DELETE"
-    })
-  }
-  forMap = (c) => {
+  forMap = c => {
     const tagElem = (
-      <Tag 
-      closable
-      
-      onClose={()=>this.deleteCategory(c.id)}
-     
-    >
-      {c.typename}
-    </Tag>
+      <Tag closable onClose={() => this.deleteCategory(c.id)}>
+        {c.typename}
+      </Tag>
     );
     return (
-      <span key={c.id} style={{ display: 'inline-block',marginBottom:"6px" }}>
+      <span key={c.id} style={{ display: "inline-block", marginBottom: "6px" }}>
         {tagElem}
       </span>
     );
-  }
-  public render(){
+  };
+  public render() {
     const { inputVisible, inputValue } = this.state;
     const tagChild = this.state.category.map(this.forMap);
-    return(
+    return (
       <div>
-        <Row>        {inputVisible && (
-          <Input
-            ref={this.saveInputRef}
-            type="text"
-            size="small"
-            style={{ width: 78 }}
-             value={inputValue}
-             onChange={this.handleInputChange}
-             onBlur={this.handleInputConfirm}
-             onPressEnter={this.handleInputConfirm}
-          />
-        )}
-        {!inputVisible && (
-          <Tag
-            onClick={this.showInput}
-            style={{ background: '#fff', borderStyle: 'dashed' }}
+        <Row>
+          {" "}
+          {inputVisible && (
+            <Input
+              ref={this.saveInputRef}
+              type="text"
+              size="small"
+              style={{ width: 78 }}
+              value={inputValue}
+              onChange={this.handleInputChange}
+              onBlur={this.handleInputConfirm}
+              onPressEnter={this.handleInputConfirm}
+            />
+          )}
+          {!inputVisible && (
+            <Tag
+              onClick={this.showInput}
+              style={{ background: "#fff", borderStyle: "dashed" }}
+            >
+              <Icon type="plus" /> 添加分类
+            </Tag>
+          )}
+        </Row>
+        <Row style={{ marginTop: "10px" }}>{tagChild} </Row>
+      </div>
+    );
+  }
+}
+
+class OrderInfo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      orders: []
+    };
+  }
+
+  componentWillMount() {
+    fetch(baseUrl + "/api/base/orders")
+      .then(res => res.json())
+      .then(r =>
+        this.setState({
+          orders: r
+        })
+      );
+  }
+
+  state: {
+    orders: {
+      id: number;
+      seller_id: number;
+      seller_info: {
+        email: string;
+        nickname: string;
+        phone: string;
+        address: string;
+      };
+      buyer_id: number;
+      buyer_info: {
+        email: string;
+        nickname: string;
+        phone: string;
+        address: string;
+      };
+      status: number;
+      time: string;
+      total_price: number;
+      address: string;
+      phone: string;
+      products: {
+        product: {
+          id: number;
+          name: string;
+          unit: string;
+          category_id: string;
+          img: string;
+        };
+        count: number;
+        price: number;
+      }[];
+    }[];
+  };
+
+  column = [
+    {
+      title: "进货卖家",
+      key: "seller_name",
+      render: (text, record, index) => <div>{record.buyer_info.nickname}</div>
+    },
+    {
+      title: "时间",
+      key: "time",
+      dataIndex: "time"
+    },
+    {
+      title: "总价",
+      key: "price",
+      dataIndex: "total_price"
+    },
+    {
+      title: "操作",
+      dataIndex: "operation",
+      key: "operation",
+      render: (text, record, index) => (
+        <span className="table-operation">
+          <Button
+            style={{ marginRight: "10px" }}
+            //      onClick={}
           >
-            <Icon type="plus" /> 添加分类
-          </Tag>
-        )}</Row>
-<Row style={{marginTop:"10px"}}>
-       { tagChild} </Row></div>
-    )
+            交付
+          </Button>
+        </span>
+      )
+    }
+  ];
+  subcolumn = [
+    {
+      title: "货品名",
+      key: "name",
+      render: record => {
+        return <div>{record.product.name}</div>;
+      }
+    },
+    {
+      title: "数量",
+      key: "count",
+      dataIndex: "count"
+    },
+    {
+      title: "价格",
+      key: "price",
+      dataIndex: "price"
+    }
+  ];
+  subTableRender = record => {
+    return (
+      <Table
+        columns={this.subcolumn}
+        dataSource={record.products}
+        rowKey={(record: any) => record.product.id}
+        pagination={false}
+      />
+    );
+  };
+  render() {
+    return (
+      <Table
+        columns={this.column}
+        expandedRowRender={record => this.subTableRender(record)}
+        dataSource={this.state.orders}
+        rowKey={record => record.id}
+      />
+    );
   }
 }
 
@@ -484,20 +605,26 @@ export class BaseCenter extends React.Component {
             >
               <Menu.Item key="1">
                 <Link to="/baseCenter">库存管理</Link>
-                
-              </Menu.Item><Menu.Item key="2">
-              <Link to="/baseCenter/category">产品分类</Link>
-                
               </Menu.Item>
-              
+              <Menu.Item key="2">
+                <Link to="/baseCenter/category">产品分类</Link>
+              </Menu.Item>
+              <Menu.Item key="3">
+                <Link to="/baseCenter/order">进货信息</Link>
+              </Menu.Item>
             </Menu>
           </Affix>
         </Sider>
         <Content
-          style={{ padding: "44px 24px", minHeight: 280, marginLeft: "16px" }}
+          style={{
+            padding: "44px 24px",
+            minHeight: 280,
+            marginLeft: "16px"
+          }}
         >
           <Route exact path="/baseCenter" component={Product} />
           <Route exact path="/baseCenter/category" component={Category} />
+          <Route path="/baseCenter/order" component={OrderInfo} />
         </Content>
       </Layout>
     );
