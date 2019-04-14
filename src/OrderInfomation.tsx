@@ -37,11 +37,12 @@ export class OrderInfomationList extends React.Component<{ fetch: any }, {}> {
 
   componentDidMount() {
     var list = this.props.fetch();
-    list.then(r => {
-      this.setState({
-        orderList: r
+    if (list != {})
+      list.then(r => {
+        this.setState({
+          orderList: r
+        });
       });
-    });
   }
 
   state: {
@@ -72,9 +73,9 @@ export class OrderInfomationList extends React.Component<{ fetch: any }, {}> {
   public render() {
     return (
       <Tabs defaultActiveKey="1" onChange={this.handleClick}>
-        <TabPane tab="待付款" key="1">
+        {/* <TabPane tab="待付款" key="1">
           {this.renderList(1)}
-        </TabPane>
+        </TabPane> */}
         <TabPane tab="待发货" key="2">
           {this.renderList(2)}
         </TabPane>

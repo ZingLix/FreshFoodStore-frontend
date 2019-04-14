@@ -70,45 +70,14 @@ class Overview extends React.Component {
 class OrderList extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      current: "1",
+      order: []
+    };
   }
   state: {
     current: string;
-    waitingOrder: OrderDetail[];
-    deliveringOrder: OrderDetail[];
-    finishedOrder: OrderDetail[];
-  };
-
-  testOrder = {
-    id: 5497,
-    seller_id: 123,
-    seller_name: "卖家名",
-    total_price: 123,
-    status: 1,
-    time: "2019-3-20",
-    address: "地址",
-    phone: "13888888888",
-    products: [
-      {
-        id: 213,
-        img: "fish.png",
-        name: "鱼",
-        unit: "条",
-        price: 123,
-        count: 3
-      }
-    ],
-    delivery: [
-      {
-        time: "2019-3-19 15:28:26",
-        info: "打包送出",
-        status: 1
-      },
-      {
-        time: "2019-3-19 19:38:41",
-        info: "抵达配送站",
-        status: 2
-      }
-    ]
+    order: OrderDetail[];
   };
 
   handleClick = e => {
@@ -117,45 +86,78 @@ class OrderList extends React.Component {
     });
   };
 
-  renderWaitingOrder() {
-    return (
-      <Row gutter={24} type="flex" justify="center" align="middle">
-        <Col span={21}>{/* <Order order={this.testOrder} /> */}</Col>
-        <Col span={3}>
-          <Button>发货</Button>
-        </Col>
-      </Row>
-    );
+  componentDidMount() {
+    var userid = localStorage.getItem("user_id");
+    if (userid == undefined) {
+      message.warn("请重新登录");
+      return;
+    }
+    fetch(baseUrl + "/api/seller/" + userid + "/order")
+      .then(r => r.json())
+      .then(r => {
+        console.log(r);
+        this.setState({
+          order: r
+        });
+      });
   }
 
-  renderDeliveringOrder() {
-    return (
-      <Row gutter={24} type="flex" justify="center" align="middle">
-        <Col span={21}>{/* <Order order={this.testOrder} /> */}</Col>
-        <Col span={3}>
-          <Button>更新物流</Button>
-        </Col>
-      </Row>
-    );
+  renderOrder(status) {
+    return this.state.order.map(item => {
+      if (item.status == status) {
+        return (
+          <Row
+            key={item.id}
+            gutter={24}
+            type="flex"
+            justify="center"
+            align="middle"
+          >
+            <Col span={21}>
+              <Order order={item} />
+            </Col>
+            <Col span={3}>
+              <Button onClick={() => this.sendout(item.id)}>发货</Button>
+            </Col>
+          </Row>
+        );
+      } else {
+        return "";
+      }
+    });
   }
-  renderFinishedOrder() {
-    return (
-      <Row gutter={24} type="flex" justify="center" align="middle">
-        <Col span={24}>{/* <Order order={this.testOrder} /> */}</Col>
-      </Row>
-    );
-  }
+
+  sendout = order_id => {
+    var userid = localStorage.getItem("user_id");
+    if (userid == undefined) {
+      message.warn("请重新登录");
+      return;
+    }
+    var request = {
+      operation: 1,
+      msg: "卖家发货"
+    };
+    fetch(baseUrl + "/api/seller/" + userid + "/order/" + order_id, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(request)
+    });
+  };
+
   public render() {
     return (
       <Tabs defaultActiveKey="1" onChange={this.handleClick}>
         <TabPane tab="待发货" key="1">
-          {this.renderWaitingOrder()}
+          {this.renderOrder(2)}
         </TabPane>
         <TabPane tab="配送中" key="2">
-          {this.renderDeliveringOrder()}
+          {this.renderOrder(3)}
         </TabPane>
         <TabPane tab="已完成" key="3">
-          {this.renderFinishedOrder()}
+          {this.renderOrder(4)}
         </TabPane>
       </Tabs>
     );

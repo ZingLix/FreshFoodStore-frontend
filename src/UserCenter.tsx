@@ -11,11 +11,13 @@ import {
   Avatar,
   Divider,
   Affix,
-  Anchor
+  Anchor,
+  message
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { OrderInfomationList } from "./OrderInfomation";
+import { baseUrl } from "./Setting";
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 
@@ -74,7 +76,18 @@ class OrderInfomation extends React.Component {
       <div style={{ marginTop: "40px" }}>
         <Title level={4}>订单管理</Title>
         <Divider />
-        <OrderInfomationList fetch={() => {}} />
+        <OrderInfomationList
+          fetch={() => {
+            var user_id = localStorage.getItem("user_id");
+            if (user_id == undefined) {
+              message.warn("请重新登录");
+              return {};
+            } else
+              return fetch(baseUrl + "/api/user/" + user_id + "/order").then(
+                r => r.json()
+              );
+          }}
+        />
       </div>
     );
   }
