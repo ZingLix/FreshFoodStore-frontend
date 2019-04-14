@@ -21,7 +21,8 @@ import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { Order, OrderInfomationList } from "./OrderInfomation";
 import { baseUrl } from "./Setting";
-import { OrderDetail } from "./Util";
+import { OrderDetail } from "./View";
+import { ClickInput } from "./Util";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -157,64 +158,6 @@ class OrderList extends React.Component {
           {this.renderFinishedOrder()}
         </TabPane>
       </Tabs>
-    );
-  }
-}
-
-class ClickInput extends React.Component<{ data: string; submit: any }, {}> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      visible: false,
-      inputvalue: this.props.data
-    };
-  }
-
-  InputRef;
-  state: {
-    visible: boolean;
-    inputvalue: string;
-  };
-
-  show = () => {
-    this.setState(
-      {
-        visible: true
-      },
-      () => this.InputRef.focus()
-    );
-  };
-  hide = () => {
-    this.setState({
-      visible: false
-    });
-  };
-  onChange = e => {
-    this.setState({
-      inputvalue: e.target.value
-    });
-  };
-  submit = e => {
-    this.props.submit(e.target.value);
-    this.hide();
-  };
-  saveInputRef = input => (this.InputRef = input);
-  render() {
-    return (
-      <div>
-        {!this.state.visible && (
-          <div onClick={this.show}>{this.props.data}</div>
-        )}
-        {this.state.visible && (
-          <Input
-            ref={this.saveInputRef}
-            value={this.state.inputvalue}
-            onBlur={this.submit}
-            onPressEnter={this.submit}
-            onChange={this.onChange}
-          />
-        )}
-      </div>
     );
   }
 }

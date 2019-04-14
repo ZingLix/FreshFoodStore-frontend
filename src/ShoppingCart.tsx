@@ -15,13 +15,24 @@ import {
   Table,
   Modal,
   Statistic,
-  Badge
+  Badge,
+  message
 } from "antd";
 import "./App.css";
+import { Product } from "./View";
+import { baseUrl } from "./Setting";
+import { ClickInput } from "./Util";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const Panel = Collapse.Panel;
+
+interface shoppingcart {
+  [seller_id: number]: {
+    id: number;
+    count: number;
+  }[];
+}
 
 interface item {
   id: number;
@@ -38,25 +49,71 @@ interface entry {
   item: item[];
 }
 
-class CheckOutModal extends React.Component<{ Item: entry[] }, {}> {
+class CheckOutModal extends React.Component<{ data: any }, {}> {
   constructor(props) {
     super(props);
+    this.state = {
+      phone: "未设定",
+      realname: "123",
+      address: "未设定"
+    };
+  }
+
+  state: {
+    phone: string;
+    realname: string;
+    address: string;
+  };
+
+  componentDidMount() {
+    var id = localStorage.getItem("user_id");
+    if (id == undefined) message.warn("请重新登录");
+    else
+      fetch(baseUrl + "/api/user/" + id + "/info")
+        .then(r => r.json())
+        .then(r =>
+          this.setState({
+            phone: r.phone,
+            realname: r.realname,
+            address: r.address
+          })
+        );
+  }
+
+  public getInfo() {
+    return {
+      phone: this.state.phone,
+      realname: this.state.realname,
+      address: this.state.address
+    };
   }
 
   columns = [
     {
       title: "商品名称",
-      dataIndex: "name",
+      render: item => (
+        <div>
+          {
+            this.props.data.product[
+              this.props.data.inventory[item.id].productId
+            ].name
+          }
+        </div>
+      ),
       key: "name"
     },
     {
       title: "单价",
       key: "price",
-      render: item => (
-        <div>
-          {item.price}元/{item.unit}
-        </div>
-      )
+      render: item => {
+        const inv = this.props.data.inventory[item.id];
+        const prod = this.props.data.product[inv.productId];
+        return (
+          <div>
+            {inv.price}元/{prod.unit}
+          </div>
+        );
+      }
     },
     {
       title: "数量",
@@ -65,7 +122,11 @@ class CheckOutModal extends React.Component<{ Item: entry[] }, {}> {
     },
     {
       title: "总价",
-      render: item => <div>{(item.price * item.count).toFixed(2)}</div>
+      render: item => {
+        const inv = this.props.data.inventory[item.id];
+        const prod = this.props.data.product[inv.productId];
+        return <div>{(inv.price * item.count).toFixed(2)}</div>;
+      }
     }
   ];
 
@@ -84,106 +145,49 @@ class CheckOutModal extends React.Component<{ Item: entry[] }, {}> {
     return (
       <div>
         <Row gutter={16}>
-          <Col span={12}>
-            <Statistic title="姓名" value={"xxx"} />
-          </Col>
-          <Col span={12}>
-            <Statistic title="电话" value={"1888888888"} />
+          <Col span={3}>姓名：</Col>
+          <Col span={8}>
+            <ClickInput
+              data={this.state.realname}
+              submit={s => this.setState({ realname: s })}
+            />
           </Col>
         </Row>
-        <Statistic
-          title="地址"
-          value={"xxx路xxx号"}
-          style={{ marginTop: "20px" }}
-        />
-        <Button style={{ marginTop: 16 }} type="primary">
-          修改
-        </Button>
+        <Row gutter={16}>
+          <Col span={3}>电话：</Col>
+          <Col span={8}>
+            <ClickInput
+              data={this.state.phone}
+              submit={s => this.setState({ phone: s })}
+            />
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={3}>地址：</Col>
+          <Col span={8}>
+            <ClickInput
+              data={this.state.address}
+              submit={s => this.setState({ address: s })}
+            />
+          </Col>
+        </Row>
+
         <Collapse bordered={false} style={{ marginTop: "20px" }}>
-          {this.props.Item.map(item => (
-            <Panel
-              header={item.seller_name}
-              key={item.seller_name}
-              style={{
-                paddingTop: "0px"
-              }}
-            >
-              {this.renderTable(item.item)}
-            </Panel>
-          ))}
+          {Object.keys(this.props.data.shoppingcart).map(seller_id => {
+            const seller = this.props.data.seller[seller_id];
+            return (
+              <Panel
+                header={seller.nickname}
+                key={seller.nickname}
+                style={{
+                  paddingTop: "0px"
+                }}
+              >
+                {this.renderTable(this.props.data.shoppingcart[seller_id])}
+              </Panel>
+            );
+          })}
         </Collapse>
-      </div>
-    );
-  }
-}
-
-class ShoppingCartItem extends React.Component<{ Item: entry }, {}> {
-  constructor(props) {
-    super(props);
-  }
-
-  public renderItem(item: item) {
-    return (
-      <Row type="flex" justify="space-around" align="middle" key={item.id}>
-        <Col
-          style={{
-            background: "#FFFFFF",
-            paddingRight: "24px"
-          }}
-          span={2}
-        >
-          <Checkbox />
-        </Col>
-        <Col
-          style={{
-            background: "#FFFFFF",
-            paddingRight: "24px"
-          }}
-          span={4}
-        >
-          <img
-            src={"/img/" + item.img}
-            style={{ width: "50px", height: "50px" }}
-          />
-        </Col>
-        <Col
-          style={{
-            background: "#FFFFFF"
-          }}
-          span={4}
-        >
-          <div>
-            <div>{item.name}</div>
-            <div>{item.price + " 元/" + item.unit}</div>
-          </div>
-        </Col>
-        <Col
-          style={{
-            background: "#FFFFFF"
-          }}
-          span={4}
-          offset={4}
-        >
-          <InputNumber min={1} defaultValue={1} />
-        </Col>
-        <Col
-          style={{
-            background: "#FFFFFF",
-            paddingLeft: "12px"
-          }}
-          span={2}
-        >
-          <Button shape="circle" icon="close" />
-        </Col>
-      </Row>
-    );
-  }
-
-  public render() {
-    return (
-      <div>
-        <Title level={4}>{this.props.Item.seller_name}</Title>
-        {this.props.Item.item.map(item => this.renderItem(item))}
       </div>
     );
   }
@@ -196,49 +200,120 @@ export class ShoppingCartAffix extends React.Component {
     super(props);
     this.state = {
       visible: false,
-      shoppintcart: {
-        1: {
-          seller_name: "xx 水果店",
-          item: [
-            {
-              id: 1,
-              inventory_id: 12,
-              name: "番茄",
-              unit: "斤",
-              price: 2.2,
-              count: 3,
-              img: "test.png"
-            }
-          ]
-        },
-        2: {
-          seller_name: "xx 超市",
-          item: [
-            {
-              id: 2,
-              inventory_id: 13,
-              name: "黄瓜",
-              unit: "斤",
-              price: 2.6,
-              count: 4,
-              img: "test.png"
-            }
-          ]
-        }
-      },
+      product: {},
+      shoppingcart: {},
+      inventory: {},
+      seller: {},
       modalVisible: false
     };
   }
 
   state: {
     visible: boolean;
-    shoppintcart: {
-      [seller_id: number]: entry;
+    product: {
+      [id: number]: Product;
     };
+    inventory: {
+      [id: number]: {
+        id: number;
+        sellerId: number;
+        productId: number;
+        count: number;
+        price: number;
+        time: string;
+      };
+    };
+    seller: {
+      [id: number]: {
+        id: number;
+        nickname: string;
+        phone: string;
+        address: string;
+      };
+    };
+    shoppingcart: shoppingcart;
     modalVisible: boolean;
   };
+  modal;
+
+  setModal = m => (this.modal = m);
+
+  addSellerInfo(id, userinfo) {
+    //  console.log(id);
+    var tmp = this.state.seller;
+    tmp[userinfo.id] = userinfo;
+    this.setState({ seller: tmp });
+  }
+
+  addInventoryInfo(id, inventoryinfo) {
+    var tmp = this.state.inventory;
+    tmp[id] = inventoryinfo;
+    this.setState({ inventory: tmp });
+  }
+
+  addProductInfo(id, productinfo) {
+    var tmp = this.state.product;
+    tmp[id] = productinfo;
+    this.setState({ product: tmp });
+  }
+
+  componentDidMount() {
+    var cart = localStorage.getItem("shoppingcart");
+    if (cart != null) {
+      var obj: shoppingcart = JSON.parse(cart);
+      for (var i in obj) {
+        if (!this.state.seller.hasOwnProperty(i)) {
+          this.addSellerInfo(i, {
+            id: i,
+            name: "...",
+            phone: "...",
+            address: "..."
+          });
+          fetch(baseUrl + "/api/user/" + i + "/info")
+            .then(r => r.json())
+            .then(r => {
+              this.addSellerInfo(i, r);
+            });
+        }
+        obj[i].map(item => {
+          if (!this.state.inventory.hasOwnProperty(item.id)) {
+            this.addInventoryInfo(item.id, {
+              id: item.id,
+              sellerId: i,
+              productId: 0,
+              count: 0,
+              price: 0,
+              time: "..."
+            });
+            fetch(baseUrl + "/api/inventory/" + item.id)
+              .then(r => r.json())
+              .then(r => {
+                this.addInventoryInfo(item.id, r);
+                if (!this.state.product.hasOwnProperty(r.productId)) {
+                  this.addProductInfo(r.productId, {
+                    id: r.productId,
+                    name: "...",
+                    unit: "...",
+                    category_id: 0,
+                    img: ""
+                  });
+                  fetch(baseUrl + "/api/products/" + r.productId)
+                    .then(r => r.json())
+                    .then(res => this.addProductInfo(r.productId, res));
+                }
+              });
+          }
+        });
+      }
+      this.setState({
+        shoppingcart: JSON.parse(cart)
+      });
+      //  console.log(cart);
+    }
+  }
 
   private showDrawer = () => {
+    this.refreshShoppingCart();
     this.setState({
       visible: true
     });
@@ -251,6 +326,7 @@ export class ShoppingCartAffix extends React.Component {
   };
 
   private openModal = () => {
+    this.refreshShoppingCart();
     this.setState({
       visible: false,
       modalVisible: true
@@ -264,6 +340,33 @@ export class ShoppingCartAffix extends React.Component {
   };
 
   private checkout = () => {
+    var user_id = localStorage.getItem("user_id");
+    if (user_id == undefined) {
+      message.warn("请重新登录");
+      return;
+    }
+    Object.values(this.state.shoppingcart).map(item => {
+      var info = this.modal.getInfo();
+      var request = {
+        id: user_id,
+        order: item,
+        realname: info.realname,
+        address: info.address,
+        phone: info.phone
+      };
+      fetch(
+        baseUrl + "/api/order/" + this.state.inventory[item[0].id].sellerId,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          method: "POST",
+          body: JSON.stringify(request)
+        }
+      );
+      //console.log(this.state.inventory[item[0].id].sellerId);
+    });
     let secondsToGo = 5;
     const modal = Modal.success({
       title: "下单成功",
@@ -283,6 +386,96 @@ export class ShoppingCartAffix extends React.Component {
       modalVisible: false
     });
   };
+
+  private refreshShoppingCart() {
+    var cart = localStorage.getItem("shoppingcart");
+    var res = cart == null ? {} : JSON.parse(cart);
+    this.setState({
+      shoppingcart: res
+    });
+  }
+
+  renderCartList(itemlist) {
+    return itemlist.map(item => {
+      const inv = this.state.inventory[item.id];
+      const prod = this.state.product[inv.productId];
+      return (
+        <Row
+          type="flex"
+          justify="space-around"
+          align="middle"
+          key={item.id}
+          style={{ marginBottom: "10px" }}
+        >
+          <Col
+            style={{
+              background: "#FFFFFF",
+              paddingRight: "24px"
+            }}
+            span={2}
+          >
+            <Checkbox />
+          </Col>
+          <Col
+            style={{
+              background: "#FFFFFF",
+              paddingRight: "24px"
+            }}
+            span={4}
+          >
+            <img
+              src={"/img/" + prod.img}
+              style={{ width: "50px", height: "50px" }}
+            />
+          </Col>
+          <Col
+            style={{
+              background: "#FFFFFF"
+            }}
+            span={4}
+          >
+            <div>
+              <div>{prod.name}</div>
+              <div>{inv.price + " 元/" + prod.unit}</div>
+            </div>
+          </Col>
+          <Col
+            style={{
+              background: "#FFFFFF"
+            }}
+            span={4}
+            offset={4}
+          >
+            <InputNumber
+              min={1}
+              defaultValue={1}
+              value={item.count}
+              onChange={e => {
+                modifyItem(inv.sellerId, item.id, e);
+                this.refreshShoppingCart();
+              }}
+            />
+          </Col>
+          <Col
+            style={{
+              background: "#FFFFFF",
+              paddingLeft: "12px"
+            }}
+            span={2}
+          >
+            <Button
+              shape="circle"
+              icon="close"
+              onClick={() => {
+                removeItem(inv.sellerId, item.id);
+                this.refreshShoppingCart();
+              }}
+            />
+          </Col>
+        </Row>
+      );
+    });
+  }
 
   public render() {
     return (
@@ -320,10 +513,16 @@ export class ShoppingCartAffix extends React.Component {
           <List
             itemLayout="vertical"
             size="large"
-            dataSource={Object.values(this.state.shoppintcart)}
+            dataSource={Object.values(this.state.shoppingcart)}
             renderItem={item => (
-              <List.Item key={item.seller_name}>
-                <ShoppingCartItem Item={item} />
+              <List.Item key={item[0].id}>
+                <Title level={4}>
+                  {
+                    this.state.seller[this.state.inventory[item[0].id].sellerId]
+                      .nickname
+                  }
+                </Title>
+                {this.renderCartList(item)}
               </List.Item>
             )}
           />
@@ -370,9 +569,73 @@ export class ShoppingCartAffix extends React.Component {
             </Button>
           ]}
         >
-          <CheckOutModal Item={Object.values(this.state.shoppintcart)} />
+          <CheckOutModal ref={this.setModal} data={this.state} />
         </Modal>
       </div>
     );
   }
+}
+
+export function addItem(seller_id, inventory_id) {
+  var tmp = localStorage.getItem("shoppingcart");
+  var cart;
+  if (tmp != null) cart = JSON.parse(tmp);
+  else cart = {};
+  var flag = false;
+  if (cart.hasOwnProperty(seller_id)) {
+    cart[seller_id].map(item => {
+      if (item.id == inventory_id) {
+        item.count++;
+        flag = true;
+      }
+    });
+    if (!flag) {
+      cart[seller_id].push({
+        id: inventory_id,
+        count: 1
+      });
+    }
+  } else {
+    cart[seller_id] = [
+      {
+        id: inventory_id,
+        count: 1
+      }
+    ];
+  }
+  localStorage.setItem("shoppingcart", JSON.stringify(cart));
+}
+
+export function removeItem(seller_id, inventory_id) {
+  var tmp = localStorage.getItem("shoppingcart");
+  var cart = {};
+  if (tmp != null) {
+    cart = JSON.parse(tmp);
+    for (var i = 0; i < cart[seller_id].length; ++i) {
+      if (cart[seller_id][i].id == inventory_id) {
+        cart[seller_id].splice(i, 1);
+        if (cart[seller_id].length == 0) {
+          delete cart[seller_id];
+          break;
+        }
+      }
+    }
+  }
+  localStorage.setItem("shoppingcart", JSON.stringify(cart));
+}
+
+export function modifyItem(seller_id, inventory_id, count) {
+  var tmp = localStorage.getItem("shoppingcart");
+  var cart = {};
+  if (tmp != null) {
+    cart = JSON.parse(tmp);
+
+    for (var i = 0; i < cart[seller_id].length; ++i) {
+      // console.log(cart[seller_id].id);
+      if (cart[seller_id][i].id == inventory_id) {
+        cart[seller_id][i].count = count;
+      }
+    }
+  }
+  localStorage.setItem("shoppingcart", JSON.stringify(cart));
 }

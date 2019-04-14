@@ -85,7 +85,8 @@ class UserInfoForm extends React.Component<Props, {}> {
         email: form.getFieldValue("email"),
         address: form.getFieldValue("address"),
         nickname: form.getFieldValue("nickname"),
-        phone: form.getFieldValue("phone")
+        phone: form.getFieldValue("phone"),
+        realname: form.getFieldValue("realname")
       };
       fetch(baseUrl + "/api/user/" + id + "/info", {
         headers: {
@@ -188,6 +189,16 @@ class UserInfoForm extends React.Component<Props, {}> {
         </Form.Item>
         <Form.Item label="电话" labelCol={{ span: 3 }}>
           {getFieldDecorator("phone", {
+            rules: []
+          })(
+            <Input
+              addonBefore={prefixSelector}
+              style={{ width: "100%", maxWidth: "500px" }}
+            />
+          )}
+        </Form.Item>
+        <Form.Item label="真实姓名" labelCol={{ span: 3 }}>
+          {getFieldDecorator("realname", {
             rules: []
           })(
             <Input

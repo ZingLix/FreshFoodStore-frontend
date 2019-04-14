@@ -1,58 +1,63 @@
 import * as React from "react";
+import { Input } from "antd";
 
-export interface OrderDetail {
-  id: number;
-  seller_id: number;
-  seller_info: {
-    email: string;
-    nickname: string;
-    phone: string;
-    address: string;
-  };
-  buyer_id: number;
-  buyer_info: {
-    email: string;
-    nickname: string;
-    phone: string;
-    address: string;
-  };
-  status: number;
-  time: string;
-  total_price: number;
-  address: string;
-  phone: string;
-  products: {
-    product: {
-      id: number;
-      name: string;
-      unit: string;
-      category_id: string;
-      img: string;
+export class ClickInput extends React.Component<
+  { data: string; submit: any },
+  {}
+> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      inputvalue: this.props.data
     };
-    count: number;
-    price: number;
-  }[];
-  delivery_info: {
-    id: number;
-    orderId: number;
-    time: string;
-    info: string;
-    status: number;
-  }[];
-}
+  }
 
-export interface Product {
-  id: number;
-  name: string;
-  unit: string;
-  category_id: number;
-  img: string;
-}
+  InputRef;
+  state: {
+    visible: boolean;
+    inputvalue: string;
+  };
 
-export interface UserInfo {
-  id: number;
-  email: string;
-  address: string;
-  nickname: string;
-  phone: string;
+  show = () => {
+    this.setState(
+      {
+        visible: true
+      },
+      () => this.InputRef.focus()
+    );
+  };
+  hide = () => {
+    this.setState({
+      visible: false
+    });
+  };
+  onChange = e => {
+    this.setState({
+      inputvalue: e.target.value
+    });
+  };
+  submit = e => {
+    this.props.submit(e.target.value);
+    this.hide();
+  };
+  saveInputRef = input => (this.InputRef = input);
+  render() {
+    return (
+      <div>
+        {!this.state.visible && (
+          <div onClick={this.show}>{this.props.data}</div>
+        )}
+        {this.state.visible && (
+          <Input
+            ref={this.saveInputRef}
+            value={this.state.inputvalue}
+            onBlur={this.submit}
+            onPressEnter={this.submit}
+            onChange={this.onChange}
+          />
+        )}
+      </div>
+    );
+  }
 }

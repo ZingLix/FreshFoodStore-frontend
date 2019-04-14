@@ -28,7 +28,7 @@ import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { Order, OrderInfomationList } from "./OrderInfomation";
 import { baseUrl } from "./Setting";
-import { OrderDetail } from "./Util";
+import { OrderDetail } from "./View";
 import Column from "antd/lib/table/Column";
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;

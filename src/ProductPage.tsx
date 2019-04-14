@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Row, Col, Typography, List, Button, Breadcrumb, Icon } from "antd";
-import { Product, UserInfo } from "./Util";
+import { Product, UserInfo } from "./View";
 import { baseUrl } from "./Setting";
+import { addItem } from "./ShoppingCart";
 const { Title } = Typography;
 
 interface InventoryItem {
@@ -92,7 +93,13 @@ export class ProductPage extends React.Component<{ match: any }, {}> {
                     renderItem={(item: InventoryItem) => (
                       <List.Item
                         style={{}}
-                        extra={<Button>添加到购物车</Button>}
+                        extra={
+                          <Button
+                            onClick={() => addItem(item.sellerId, item.id)}
+                          >
+                            添加到购物车
+                          </Button>
+                        }
                       >
                         <div style={{ paddingRight: "10px", width: "100%" }}>
                           {item.price} 元 / {this.state.product_info.unit}

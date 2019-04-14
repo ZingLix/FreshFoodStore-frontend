@@ -14,7 +14,7 @@ import {
 } from "antd";
 import { number } from "prop-types";
 import { baseUrl } from "./Setting";
-import { OrderDetail } from "./Util";
+import { OrderDetail } from "./View";
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
