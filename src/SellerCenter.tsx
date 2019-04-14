@@ -14,12 +14,14 @@ import {
   Tabs,
   Table,
   InputNumber,
-  message
+  message,
+  Input
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
-import { Order, order, OrderInfomationList } from "./OrderInfomation";
+import { Order, OrderInfomationList } from "./OrderInfomation";
 import { baseUrl } from "./Setting";
+import { OrderDetail } from "./Util";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -70,9 +72,9 @@ class OrderList extends React.Component {
   }
   state: {
     current: string;
-    waitingOrder: order[];
-    deliveringOrder: order[];
-    finishedOrder: order[];
+    waitingOrder: OrderDetail[];
+    deliveringOrder: OrderDetail[];
+    finishedOrder: OrderDetail[];
   };
 
   testOrder = {
@@ -117,9 +119,7 @@ class OrderList extends React.Component {
   renderWaitingOrder() {
     return (
       <Row gutter={24} type="flex" justify="center" align="middle">
-        <Col span={21}>
-          <Order order={this.testOrder} />
-        </Col>
+        <Col span={21}>{/* <Order order={this.testOrder} /> */}</Col>
         <Col span={3}>
           <Button>发货</Button>
         </Col>
@@ -130,9 +130,7 @@ class OrderList extends React.Component {
   renderDeliveringOrder() {
     return (
       <Row gutter={24} type="flex" justify="center" align="middle">
-        <Col span={21}>
-          <Order order={this.testOrder} />
-        </Col>
+        <Col span={21}>{/* <Order order={this.testOrder} /> */}</Col>
         <Col span={3}>
           <Button>更新物流</Button>
         </Col>
@@ -142,9 +140,7 @@ class OrderList extends React.Component {
   renderFinishedOrder() {
     return (
       <Row gutter={24} type="flex" justify="center" align="middle">
-        <Col span={24}>
-          <Order order={this.testOrder} />
-        </Col>
+        <Col span={24}>{/* <Order order={this.testOrder} /> */}</Col>
       </Row>
     );
   }
@@ -165,81 +161,187 @@ class OrderList extends React.Component {
   }
 }
 
+class ClickInput extends React.Component<{ data: string; submit: any }, {}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      inputvalue: this.props.data
+    };
+  }
+
+  InputRef;
+  state: {
+    visible: boolean;
+    inputvalue: string;
+  };
+
+  show = () => {
+    this.setState(
+      {
+        visible: true
+      },
+      () => this.InputRef.focus()
+    );
+  };
+  hide = () => {
+    this.setState({
+      visible: false
+    });
+  };
+  onChange = e => {
+    this.setState({
+      inputvalue: e.target.value
+    });
+  };
+  submit = e => {
+    this.props.submit(e.target.value);
+    this.hide();
+  };
+  saveInputRef = input => (this.InputRef = input);
+  render() {
+    return (
+      <div>
+        {!this.state.visible && (
+          <div onClick={this.show}>{this.props.data}</div>
+        )}
+        {this.state.visible && (
+          <Input
+            ref={this.saveInputRef}
+            value={this.state.inputvalue}
+            onBlur={this.submit}
+            onPressEnter={this.submit}
+            onChange={this.onChange}
+          />
+        )}
+      </div>
+    );
+  }
+}
+
 class ProductList extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      inventory: [],
+      countVisible: false
+    };
   }
-  state = {
-    inventory: [
-      {
-        id: 1,
-        name: "番茄",
-        unit: "斤",
-        inventory: [
-          {
-            recordid: 2,
-            date: "2019-3-18",
-            remain: 139,
-            price: 3.3
+  state: {
+    inventory: {
+      product_id: number;
+      product: {
+        id: number;
+        name: string;
+        unit: string;
+        category_id: number;
+        img: string;
+      };
+      inventoryList: {
+        id: number;
+        sellerId: number;
+        productId: number;
+        count: number;
+        price: number;
+        time: string;
+      }[];
+    }[];
+    countVisible: boolean;
+  };
+
+  componentWillMount() {
+    var id = localStorage.getItem("user_id");
+    if (id == undefined) message.error("请重新登录");
+    else {
+      fetch(baseUrl + "/api/seller/" + id + "/inventory")
+        .then(r => r.json())
+        .then(r =>
+          this.setState({
+            inventory: r
+          })
+        );
+    }
+  }
+
+  updateItem = (item, count, price) => {
+    var tmp = this.state.inventory;
+    for (var u of tmp) {
+      if (u.product_id == item.productId) {
+        for (var v of u.inventoryList) {
+          if (v.id == item.id) {
+            v.count = count;
+            v.price = price;
+            fetch(
+              baseUrl +
+                "/api/seller/" +
+                localStorage.getItem("user_id") +
+                "/inventory/" +
+                item.id,
+              {
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: JSON.stringify(v)
+              }
+            );
           }
-        ]
-      },
-      {
-        id: 2,
-        name: "黄瓜",
-        unit: "斤",
-        inventory: [
-          {
-            recordid: 5,
-            date: "2019-3-14",
-            remain: 129,
-            price: 0.3
-          },
-          {
-            recordid: 7,
-            date: "2019-3-16",
-            remain: 15,
-            price: 2.3
-          }
-        ]
+        }
       }
-    ]
+    }
+    this.setState({
+      inventoryList: tmp
+    });
   };
 
   tableColumn = [
     {
       title: "商品名",
-      render: item => <a href={"/product/" + item.id}>{item.name}</a>,
+      render: item => (
+        <a href={"/product/" + item.product_id}>{item.product.name}</a>
+      ),
       key: "name"
     },
-    { title: "单位", dataIndex: "unit", key: "unit" }
+    {
+      title: "单位",
+      render: item => <div>{item.product.unit}</div>,
+      key: "unit"
+    }
   ];
   subTableColumn = [
     {
       title: "入库日期",
-      dataIndex: "date",
-      key: "date"
+      dataIndex: "time",
+      key: "time"
     },
     {
       title: "剩余数量",
-      dataIndex: "remain",
-      key: "remain"
+      render: item => {
+        return (
+          <ClickInput
+            data={item.count}
+            submit={t => {
+              this.updateItem(item, parseInt(t), item.price);
+            }}
+          />
+        );
+      },
+      key: "count"
     },
     {
       title: "当前价格",
-      dataIndex: "price",
+      render: item => {
+        return (
+          <ClickInput
+            data={item.price}
+            submit={t => {
+              this.updateItem(item, item.count, parseInt(t));
+            }}
+          />
+        );
+      },
       key: "price"
-    },
-    {
-      title: "操作",
-      dataIndex: "operation",
-      key: "operation",
-      render: () => (
-        <span className="table-operation">
-          <Button style={{ marginRight: "10px" }}>舍弃</Button>
-          <Button>调价</Button>
-        </span>
-      )
     }
   ];
 
@@ -247,9 +349,9 @@ class ProductList extends React.Component {
     return (
       <Table
         columns={this.subTableColumn}
-        dataSource={this.state.inventory[index].inventory}
+        dataSource={record.inventoryList}
         pagination={false}
-        rowKey={record => record.recordid.toString()}
+        rowKey={(record: any) => record.id.toString()}
       />
     );
   };
@@ -260,7 +362,7 @@ class ProductList extends React.Component {
         columns={this.tableColumn}
         expandedRowRender={this.subTable}
         dataSource={this.state.inventory}
-        rowKey={record => record.id.toString()}
+        rowKey={record => record.product_id.toString()}
       />
     );
   }
@@ -391,7 +493,18 @@ class Stock extends React.Component {
 
 class StockList extends React.Component {
   public render() {
-    return <OrderInfomationList />;
+    return (
+      <OrderInfomationList
+        fetch={() =>
+          fetch(
+            baseUrl +
+              "/api/seller/" +
+              localStorage.getItem("user_id") +
+              "/stock"
+          ).then(r => r.json())
+        }
+      />
+    );
   }
 }
 

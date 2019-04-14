@@ -74,7 +74,7 @@ class OrderInfomation extends React.Component {
       <div style={{ marginTop: "40px" }}>
         <Title level={4}>订单管理</Title>
         <Divider />
-        <OrderInfomationList />
+        <OrderInfomationList fetch={() => {}} />
       </div>
     );
   }

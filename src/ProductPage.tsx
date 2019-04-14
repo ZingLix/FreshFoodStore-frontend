@@ -1,63 +1,57 @@
 import * as React from "react";
 import { Row, Col, Typography, List, Button, Breadcrumb, Icon } from "antd";
-
+import { Product, UserInfo } from "./Util";
+import { baseUrl } from "./Setting";
 const { Title } = Typography;
 
-interface ProductInfo {
+interface InventoryItem {
   id: number;
-  name: string;
-  unit: string;
-  img: string;
-}
-
-interface InventoryInfo {
-  id: number;
-  seller_id: number;
-  seller_name: string;
+  sellerId: number;
+  productId: number;
   count: number;
   price: number;
   time: string;
 }
 
-interface props {
-  id: number;
+interface InventoryInfo {
+  sellerId: number;
+  sellerInfo: UserInfo;
+  inventoryList: InventoryItem[];
 }
 
-export class ProductPage extends React.Component {
+export class ProductPage extends React.Component<{ match: any }, {}> {
   constructor(props) {
     super(props);
     this.state = {
       product_info: {
-        id: 1,
-        name: "番茄",
-        unit: "斤",
-        img: "test.png"
+        id: 0,
+        name: "",
+        unit: "",
+        img: "",
+        category_id: 0
       },
-      inventory_list: [
-        {
-          id: 321,
-          seller_id: 1,
-          seller_name: "xx水果店",
-          price: 3.3,
-          count: 300,
-          time: "2019-3-18"
-        },
-        {
-          id: 123,
-          seller_id: 2,
-          seller_name: "xx超市",
-          price: 3.5,
-          count: 300,
-          time: "2019-3-19"
-        }
-      ]
+      inventory_list: []
     };
   }
 
   state: {
-    product_info: ProductInfo;
+    product_info: Product;
     inventory_list: InventoryInfo[];
   };
+
+  componentDidMount() {
+    var productid = this.props.match.params.id;
+    fetch(baseUrl + "/api/products/" + productid + "/inventory")
+      .then(r => r.json())
+      .then(r =>
+        this.setState({
+          inventory_list: r
+        })
+      );
+    fetch(baseUrl + "/api/products/" + productid)
+      .then(r => r.json())
+      .then(r => this.setState({ product_info: r }));
+  }
 
   public render() {
     return (
@@ -72,7 +66,11 @@ export class ProductPage extends React.Component {
         </Breadcrumb>
         <Row
           gutter={24}
-          style={{ padding: "24px 0", background: "#fff", marginTop: "12px" }}
+          style={{
+            padding: "24px 0",
+            background: "#fff",
+            marginTop: "12px"
+          }}
         >
           <Col span={8}>
             <img
@@ -83,18 +81,27 @@ export class ProductPage extends React.Component {
           <Col span={16}>
             <Title level={2}>{this.state.product_info.name}</Title>
             <List
-              itemLayout="horizontal"
+              itemLayout="vertical"
               dataSource={this.state.inventory_list}
               renderItem={(item: InventoryInfo) => (
                 <List.Item>
-                  <List.Item.Meta
-                    title={item.seller_name}
-                    description={item.time}
+                  <List.Item.Meta title={item.sellerInfo.nickname} />
+                  <List
+                    itemLayout="horizontal"
+                    dataSource={item.inventoryList}
+                    renderItem={(item: InventoryItem) => (
+                      <List.Item
+                        style={{}}
+                        extra={<Button>添加到购物车</Button>}
+                      >
+                        <div style={{ paddingRight: "10px", width: "100%" }}>
+                          {item.price} 元 / {this.state.product_info.unit}
+                          <br />
+                          {item.time}
+                        </div>
+                      </List.Item>
+                    )}
                   />
-                  <div style={{ paddingRight: "10px" }}>
-                    {item.price} 元 / {this.state.product_info.unit}
-                  </div>
-                  <Button>添加到购物车</Button>
                 </List.Item>
               )}
             />

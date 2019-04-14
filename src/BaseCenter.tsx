@@ -26,8 +26,9 @@ import {
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
-import { Order, order, OrderInfomationList } from "./OrderInfomation";
+import { Order, OrderInfomationList } from "./OrderInfomation";
 import { baseUrl } from "./Setting";
+import { OrderDetail } from "./Util";
 import Column from "antd/lib/table/Column";
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -434,7 +435,6 @@ class Category extends React.Component {
     return (
       <div>
         <Row>
-          {" "}
           {inputVisible && (
             <Input
               ref={this.saveInputRef}
@@ -479,41 +479,21 @@ class OrderInfo extends React.Component {
         })
       );
   }
-
+  deliver = record => {
+    console.log(record);
+    fetch(baseUrl + "/api/base/orders/" + record.id, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify({ operation: 1, message: "" })
+    })
+      .then(r => r.json())
+      .then(r => console.log(r));
+  };
   state: {
-    orders: {
-      id: number;
-      seller_id: number;
-      seller_info: {
-        email: string;
-        nickname: string;
-        phone: string;
-        address: string;
-      };
-      buyer_id: number;
-      buyer_info: {
-        email: string;
-        nickname: string;
-        phone: string;
-        address: string;
-      };
-      status: number;
-      time: string;
-      total_price: number;
-      address: string;
-      phone: string;
-      products: {
-        product: {
-          id: number;
-          name: string;
-          unit: string;
-          category_id: string;
-          img: string;
-        };
-        count: number;
-        price: number;
-      }[];
-    }[];
+    orders: OrderDetail[];
   };
 
   column = [
@@ -540,7 +520,10 @@ class OrderInfo extends React.Component {
         <span className="table-operation">
           <Button
             style={{ marginRight: "10px" }}
-            //      onClick={}
+            disabled={record.status == 4}
+            onClick={() => {
+              this.deliver(record);
+            }}
           >
             交付
           </Button>
