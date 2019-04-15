@@ -1,22 +1,34 @@
 import * as React from "react";
 import { Card, Icon, Avatar } from "antd";
 import { Link } from "react-router-dom";
+import { Product } from "./View";
 
 const { Meta } = Card;
 
 interface itemProps {
   data: {
     id: number;
-    name: string;
-    unit: string;
     minprice: number;
-    img: string;
+    product: Product;
   };
 }
 export class Item extends React.Component<itemProps, {}> {
   constructor(props) {
     super(props);
   }
+
+  renderPrice = () => {
+    if (this.props.data.minprice == 0) {
+      return <div>暂时缺货</div>;
+    } else {
+      return (
+        <div>
+          {this.props.data.minprice} 元/
+          {this.props.data.product.unit} 起
+        </div>
+      );
+    }
+  };
 
   public render() {
     return (
@@ -26,7 +38,7 @@ export class Item extends React.Component<itemProps, {}> {
           <Link to={"/product/" + this.props.data.id}>
             <img
               alt="example"
-              src={"/img/" + this.props.data.img}
+              src={"/img/" + this.props.data.product.img}
               style={{ width: "100%", height: 250 }}
             />
           </Link>
@@ -40,10 +52,8 @@ export class Item extends React.Component<itemProps, {}> {
         ]}
       >
         <Meta
-          title={this.props.data.name}
-          description={
-            this.props.data.minprice + "元/" + this.props.data.unit + " 起"
-          }
+          title={this.props.data.product.name}
+          description={<div>{this.renderPrice()}</div>}
         />
       </Card>
     );

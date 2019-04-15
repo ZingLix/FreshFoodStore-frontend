@@ -31,6 +31,28 @@ const TabPane = Tabs.TabPane;
 class Overview extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      username: "用户名"
+    };
+  }
+
+  state: {
+    username: string;
+  };
+
+  componentWillMount() {
+    var userid = localStorage.getItem("user_id");
+    if (userid == undefined) {
+      message.warn("请重新登陆");
+    } else {
+      fetch("/api/user/" + userid + "/info")
+        .then(r => r.json())
+        .then(r =>
+          this.setState({
+            username: r.nickname
+          })
+        );
+    }
   }
   public render() {
     return (
@@ -42,7 +64,7 @@ class Overview extends React.Component {
           <Col>
             {" "}
             <Title level={4} style={{ marginLeft: "40px" }}>
-              用户名
+              {this.state.username}
             </Title>
           </Col>
         </Row>
@@ -110,10 +132,6 @@ class OrderList extends React.Component {
       }
     });
   }
-
-  
-
-
 
   public render() {
     return (
