@@ -204,7 +204,8 @@ export class ShoppingCartAffix extends React.Component {
       shoppingcart: {},
       inventory: {},
       seller: {},
-      modalVisible: false
+      modalVisible: false,
+      count: 0
     };
   }
 
@@ -233,6 +234,7 @@ export class ShoppingCartAffix extends React.Component {
     };
     shoppingcart: shoppingcart;
     modalVisible: boolean;
+    count: number;
   };
   modal;
 
@@ -258,58 +260,7 @@ export class ShoppingCartAffix extends React.Component {
   }
 
   componentDidMount() {
-    var cart = localStorage.getItem("shoppingcart");
-    if (cart != null) {
-      var obj: shoppingcart = JSON.parse(cart);
-      for (var i in obj) {
-        if (!this.state.seller.hasOwnProperty(i)) {
-          this.addSellerInfo(i, {
-            id: i,
-            name: "...",
-            phone: "...",
-            address: "..."
-          });
-          fetch(baseUrl + "/api/user/" + i + "/info")
-            .then(r => r.json())
-            .then(r => {
-              this.addSellerInfo(i, r);
-            });
-        }
-        obj[i].map(item => {
-          if (!this.state.inventory.hasOwnProperty(item.id)) {
-            this.addInventoryInfo(item.id, {
-              id: item.id,
-              sellerId: i,
-              productId: 0,
-              count: 0,
-              price: 0,
-              time: "..."
-            });
-            fetch(baseUrl + "/api/inventory/" + item.id)
-              .then(r => r.json())
-              .then(r => {
-                this.addInventoryInfo(item.id, r);
-                if (!this.state.product.hasOwnProperty(r.productId)) {
-                  this.addProductInfo(r.productId, {
-                    id: r.productId,
-                    name: "...",
-                    unit: "...",
-                    category_id: 0,
-                    img: ""
-                  });
-                  fetch(baseUrl + "/api/products/" + r.productId)
-                    .then(r => r.json())
-                    .then(res => this.addProductInfo(r.productId, res));
-                }
-              });
-          }
-        });
-      }
-      this.setState({
-        shoppingcart: JSON.parse(cart)
-      });
-      //  console.log(cart);
-    }
+    this.refreshShoppingCart();
   }
 
   private showDrawer = () => {
@@ -387,18 +338,70 @@ export class ShoppingCartAffix extends React.Component {
     });
   };
 
-  private refreshShoppingCart() {
+  public refreshShoppingCart() {
     var cart = localStorage.getItem("shoppingcart");
-    var res = cart == null ? {} : JSON.parse(cart);
-    this.setState({
-      shoppingcart: res
-    });
+    if (cart != null) {
+      var obj: shoppingcart = JSON.parse(cart);
+      for (var i in obj) {
+        if (!this.state.seller.hasOwnProperty(i)) {
+          this.addSellerInfo(i, {
+            id: i,
+            name: "...",
+            phone: "...",
+            address: "..."
+          });
+          fetch(baseUrl + "/api/user/" + i + "/info")
+            .then(r => r.json())
+            .then(r => {
+              this.addSellerInfo(i, r);
+            });
+        }
+        obj[i].map(item => {
+          if (!this.state.inventory.hasOwnProperty(item.id)) {
+            this.addInventoryInfo(item.id, {
+              id: item.id,
+              sellerId: i,
+              productId: 0,
+              count: 0,
+              price: 0,
+              time: "..."
+            });
+            fetch(baseUrl + "/api/inventory/" + item.id)
+              .then(r => r.json())
+              .then(r => {
+                this.addInventoryInfo(item.id, r);
+                if (!this.state.product.hasOwnProperty(r.productId)) {
+                  this.addProductInfo(r.productId, {
+                    id: r.productId,
+                    name: "...",
+                    unit: "...",
+                    category_id: 0,
+                    img: ""
+                  });
+                  fetch(baseUrl + "/api/products/" + r.productId)
+                    .then(r => r.json())
+                    .then(res => this.addProductInfo(r.productId, res));
+                }
+              });
+          }
+        });
+      }
+      this.setState(
+        {
+          shoppingcart: JSON.parse(cart)
+        },
+        () => {
+          this.cartcount();
+        }
+      );
+    }
   }
 
   renderCartList(itemlist) {
     return itemlist.map(item => {
       const inv = this.state.inventory[item.id];
       const prod = this.state.product[inv.productId];
+      if (inv == undefined || prod == undefined) return "";
       return (
         <Row
           type="flex"
@@ -477,6 +480,16 @@ export class ShoppingCartAffix extends React.Component {
     });
   }
 
+  cartcount = () => {
+    var count = 0;
+    Object.values(this.state.shoppingcart).map(item => {
+      count += item.length;
+    });
+    this.setState({
+      count: count
+    });
+  };
+
   public render() {
     return (
       <div>
@@ -491,7 +504,7 @@ export class ShoppingCartAffix extends React.Component {
             }}
             onClick={this.showDrawer}
           >
-            <Badge count={2}>
+            <Badge count={this.state.count}>
               <Icon
                 type="shopping-cart"
                 style={{
@@ -576,6 +589,12 @@ export class ShoppingCartAffix extends React.Component {
   }
 }
 
+let shoppingcart;
+
+export let setshoppingcartref = c => {
+  shoppingcart = c;
+};
+
 export function addItem(seller_id, inventory_id) {
   var tmp = localStorage.getItem("shoppingcart");
   var cart;
@@ -604,6 +623,7 @@ export function addItem(seller_id, inventory_id) {
     ];
   }
   localStorage.setItem("shoppingcart", JSON.stringify(cart));
+  shoppingcart.refreshShoppingCart();
 }
 
 export function removeItem(seller_id, inventory_id) {
@@ -622,6 +642,7 @@ export function removeItem(seller_id, inventory_id) {
     }
   }
   localStorage.setItem("shoppingcart", JSON.stringify(cart));
+  shoppingcart.refreshShoppingCart();
 }
 
 export function modifyItem(seller_id, inventory_id, count) {
@@ -638,4 +659,5 @@ export function modifyItem(seller_id, inventory_id, count) {
     }
   }
   localStorage.setItem("shoppingcart", JSON.stringify(cart));
+  shoppingcart.refreshShoppingCart();
 }

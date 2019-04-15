@@ -8,7 +8,7 @@ import { BaseCenter } from "./BaseCenter";
 import { UserCenter } from "./UserCenter";
 import { ProductPage } from "./ProductPage";
 import { SellerCenter } from "./SellerCenter";
-import { ShoppingCartAffix } from "./ShoppingCart";
+import { ShoppingCartAffix, setshoppingcartref } from "./ShoppingCart";
 
 const { Header, Footer, Sider, Content } = Layout;
 const Search = Input.Search;
@@ -140,7 +140,7 @@ class App extends React.Component {
             <Route path="/product/:id" component={ProductPage} />
             <Route path="/sellerCenter" component={SellerCenter} />
             <Route path="/baseCenter" component={BaseCenter} />
-            <ShoppingCartAffix />
+            <ShoppingCartAffix ref={setshoppingcartref}/>
           </Content>
           <Footer style={{ textAlign: "center" }} />
         </Layout>
