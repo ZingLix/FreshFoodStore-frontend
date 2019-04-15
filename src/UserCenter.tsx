@@ -83,10 +83,11 @@ class OrderInfomation extends React.Component {
               message.warn("请重新登录");
               return {};
             } else
-              return fetch( "/api/user/" + user_id + "/order").then(
-                r => r.json()
+              return fetch("/api/user/" + user_id + "/order").then(r =>
+                r.json()
               );
           }}
+          seller={false}
         />
       </div>
     );

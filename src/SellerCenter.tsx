@@ -92,7 +92,7 @@ class OrderList extends React.Component {
       message.warn("请重新登录");
       return;
     }
-    fetch( "/api/seller/" + userid + "/order")
+    fetch("/api/seller/" + userid + "/order")
       .then(r => r.json())
       .then(r => {
         this.setState({
@@ -104,77 +104,16 @@ class OrderList extends React.Component {
   renderOrder(status) {
     return this.state.order.map(item => {
       if (item.status == status) {
-        return (
-          <Row
-            key={item.id}
-            gutter={24}
-            type="flex"
-            justify="center"
-            align="middle"
-          >
-            <Col span={21}>
-              <Order order={item} />
-            </Col>
-            <Col span={3}>
-              {status == 2 && (
-                <Button onClick={() => this.sendout(item.id)}>发货</Button>
-              )}
-              {status == 3 && (
-                <Search
-                  placeholder="input search text"
-                  enterButton="Search"
-                  size="large"
-                  onSearch={value => this.addDeliveryInfo(item.id, value)}
-                />
-              )}
-            </Col>
-          </Row>
-        );
+        return <Order key={item.id} order={item} seller={true} />;
       } else {
         return "";
       }
     });
   }
 
-  sendout = order_id => {
-    var userid = localStorage.getItem("user_id");
-    if (userid == undefined) {
-      message.warn("请重新登录");
-      return;
-    }
-    var request = {
-      operation: 1,
-      message: "卖家发货"
-    };
-    fetch( "/api/seller/" + userid + "/order/" + order_id, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: JSON.stringify(request)
-    });
-  };
+  
 
-  addDeliveryInfo = (order_id, msg) => {
-    var userid = localStorage.getItem("user_id");
-    if (userid == undefined) {
-      message.warn("请重新登录");
-      return;
-    }
-    var request = {
-      operation: 2,
-      message: msg
-    };
-    fetch( "/api/seller/" + userid + "/order/" + order_id, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: JSON.stringify(request)
-    });
-  };
+
 
   public render() {
     return (
@@ -227,7 +166,7 @@ class ProductList extends React.Component {
     var id = localStorage.getItem("user_id");
     if (id == undefined) message.error("请重新登录");
     else {
-      fetch( "/api/seller/" + id + "/inventory")
+      fetch("/api/seller/" + id + "/inventory")
         .then(r => r.json())
         .then(r =>
           this.setState({
@@ -246,8 +185,7 @@ class ProductList extends React.Component {
             v.count = count;
             v.price = price;
             fetch(
-              
-                "/api/seller/" +
+              "/api/seller/" +
                 localStorage.getItem("user_id") +
                 "/inventory/" +
                 item.id,
@@ -364,7 +302,7 @@ class StockButton extends React.Component<{ Productid: number }, {}> {
         count: this.state.val
       };
       list.push(tmp);
-      fetch( "/api/seller/" + id + "/products", {
+      fetch("/api/seller/" + id + "/products", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
@@ -411,7 +349,7 @@ class Stock extends React.Component {
     }[];
   };
   componentWillMount() {
-    fetch( "/api/seller/baseProducts")
+    fetch("/api/seller/baseProducts")
       .then(response => response.json())
       .then(r => {
         this.setState({
@@ -471,12 +409,10 @@ class StockList extends React.Component {
       <OrderInfomationList
         fetch={() =>
           fetch(
-            
-              "/api/seller/" +
-              localStorage.getItem("user_id") +
-              "/stock"
+            "/api/seller/" + localStorage.getItem("user_id") + "/stock"
           ).then(r => r.json())
         }
+        seller={true}
       />
     );
   }

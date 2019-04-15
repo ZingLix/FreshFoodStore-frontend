@@ -3,42 +3,21 @@ import * as React from "react";
 export interface OrderDetail {
   id: number;
   seller_id: number;
-  seller_info: {
-    email: string;
-    nickname: string;
-    phone: string;
-    address: string;
-  };
+  seller_info: UserInfo;
   buyer_id: number;
-  buyer_info: {
-    email: string;
-    nickname: string;
-    phone: string;
-    address: string;
-  };
+  buyer_info: UserInfo;
   status: number;
   time: string;
   total_price: number;
   address: string;
   phone: string;
+  realname: string;
   products: {
-    product: {
-      id: number;
-      name: string;
-      unit: string;
-      category_id: string;
-      img: string;
-    };
+    product: Product;
     count: number;
     price: number;
   }[];
-  delivery_info: {
-    id: number;
-    orderId: number;
-    time: string;
-    info: string;
-    status: number;
-  }[];
+  delivery_info: DeliveryInfo[];
 }
 
 export interface Product {
@@ -49,10 +28,19 @@ export interface Product {
   img: string;
 }
 
+export interface DeliveryInfo {
+  id: number;
+  orderId: number;
+  time: string;
+  info: string;
+  status: number;
+}
+
 export interface UserInfo {
   id: number;
   email: string;
   address: string;
   nickname: string;
+  realname:string;
   phone: string;
 }
