@@ -2,7 +2,6 @@ import * as React from "react";
 import { Form, Icon, Input, Button, Checkbox, message } from "antd";
 import { WrappedFormUtils } from "antd/lib/form/Form";
 import "./App.css";
-import { baseUrl } from "./Setting";
 
 interface Props {
   form: WrappedFormUtils;
@@ -36,7 +35,7 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
   }
 
   login = e => {
-    fetch(baseUrl + "/api/user/login", {
+    fetch( "/api/user/login", {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
@@ -56,7 +55,7 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
   };
 
   register = e => {
-    fetch(baseUrl + "/api/user", {
+    fetch( "/api/user", {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"

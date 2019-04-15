@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Row, Col, Typography, List, Button, Breadcrumb, Icon } from "antd";
 import { Product, UserInfo } from "./View";
-import { baseUrl } from "./Setting";
 import { addItem } from "./ShoppingCart";
 const { Title } = Typography;
 
@@ -42,14 +41,14 @@ export class ProductPage extends React.Component<{ match: any }, {}> {
 
   componentDidMount() {
     var productid = this.props.match.params.id;
-    fetch(baseUrl + "/api/products/" + productid + "/inventory")
+    fetch("/api/products/" + productid + "/inventory")
       .then(r => r.json())
       .then(r =>
         this.setState({
           inventory_list: r
         })
       );
-    fetch(baseUrl + "/api/products/" + productid)
+    fetch("/api/products/" + productid)
       .then(r => r.json())
       .then(r => this.setState({ product_info: r }));
   }

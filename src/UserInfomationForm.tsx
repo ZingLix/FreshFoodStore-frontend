@@ -13,7 +13,6 @@ import {
   AutoComplete
 } from "antd";
 import { WrappedFormUtils } from "antd/lib/form/Form";
-import { baseUrl } from "./Setting";
 
 const { Option } = Select;
 const AutoCompleteOption = AutoComplete.Option;
@@ -65,7 +64,7 @@ class UserInfoForm extends React.Component<Props, {}> {
     var id = localStorage.getItem("user_id");
     if (id == null) message.error("请重新登录");
     else
-      fetch(baseUrl + "/api/user/" + id + "/info")
+      fetch( "/api/user/" + id + "/info")
         .then(r => {
           return r.json();
         })
@@ -88,7 +87,7 @@ class UserInfoForm extends React.Component<Props, {}> {
         phone: form.getFieldValue("phone"),
         realname: form.getFieldValue("realname")
       };
-      fetch(baseUrl + "/api/user/" + id + "/info", {
+      fetch( "/api/user/" + id + "/info", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"

@@ -20,7 +20,6 @@ import {
 } from "antd";
 import "./App.css";
 import { Product } from "./View";
-import { baseUrl } from "./Setting";
 import { ClickInput } from "./Util";
 
 const { Header, Footer, Sider, Content } = Layout;
@@ -69,7 +68,7 @@ class CheckOutModal extends React.Component<{ data: any }, {}> {
     var id = localStorage.getItem("user_id");
     if (id == undefined) message.warn("请重新登录");
     else
-      fetch(baseUrl + "/api/user/" + id + "/info")
+      fetch("/api/user/" + id + "/info")
         .then(r => r.json())
         .then(r =>
           this.setState({
@@ -306,7 +305,7 @@ export class ShoppingCartAffix extends React.Component {
         phone: info.phone
       };
       fetch(
-        baseUrl + "/api/order/" + this.state.inventory[item[0].id].sellerId,
+         "/api/order/" + this.state.inventory[item[0].id].sellerId,
         {
           headers: {
             Accept: "application/json",
@@ -350,7 +349,7 @@ export class ShoppingCartAffix extends React.Component {
             phone: "...",
             address: "..."
           });
-          fetch(baseUrl + "/api/user/" + i + "/info")
+          fetch(  "/api/user/" + i + "/info")
             .then(r => r.json())
             .then(r => {
               this.addSellerInfo(i, r);
@@ -366,7 +365,7 @@ export class ShoppingCartAffix extends React.Component {
               price: 0,
               time: "..."
             });
-            fetch(baseUrl + "/api/inventory/" + item.id)
+            fetch( "/api/inventory/" + item.id)
               .then(r => r.json())
               .then(r => {
                 this.addInventoryInfo(item.id, r);
@@ -378,7 +377,7 @@ export class ShoppingCartAffix extends React.Component {
                     category_id: 0,
                     img: ""
                   });
-                  fetch(baseUrl + "/api/products/" + r.productId)
+                  fetch( "/api/products/" + r.productId)
                     .then(r => r.json())
                     .then(res => this.addProductInfo(r.productId, res));
                 }

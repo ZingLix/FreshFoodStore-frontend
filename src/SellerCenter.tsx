@@ -20,10 +20,10 @@ import {
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { Order, OrderInfomationList } from "./OrderInfomation";
-import { baseUrl } from "./Setting";
 import { OrderDetail } from "./View";
 import { ClickInput } from "./Util";
 
+const { Search } = Input;
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const TabPane = Tabs.TabPane;
@@ -92,10 +92,9 @@ class OrderList extends React.Component {
       message.warn("请重新登录");
       return;
     }
-    fetch(baseUrl + "/api/seller/" + userid + "/order")
+    fetch( "/api/seller/" + userid + "/order")
       .then(r => r.json())
       .then(r => {
-        console.log(r);
         this.setState({
           order: r
         });
@@ -117,7 +116,17 @@ class OrderList extends React.Component {
               <Order order={item} />
             </Col>
             <Col span={3}>
-              <Button onClick={() => this.sendout(item.id)}>发货</Button>
+              {status == 2 && (
+                <Button onClick={() => this.sendout(item.id)}>发货</Button>
+              )}
+              {status == 3 && (
+                <Search
+                  placeholder="input search text"
+                  enterButton="Search"
+                  size="large"
+                  onSearch={value => this.addDeliveryInfo(item.id, value)}
+                />
+              )}
             </Col>
           </Row>
         );
@@ -135,9 +144,29 @@ class OrderList extends React.Component {
     }
     var request = {
       operation: 1,
-      msg: "卖家发货"
+      message: "卖家发货"
     };
-    fetch(baseUrl + "/api/seller/" + userid + "/order/" + order_id, {
+    fetch( "/api/seller/" + userid + "/order/" + order_id, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(request)
+    });
+  };
+
+  addDeliveryInfo = (order_id, msg) => {
+    var userid = localStorage.getItem("user_id");
+    if (userid == undefined) {
+      message.warn("请重新登录");
+      return;
+    }
+    var request = {
+      operation: 2,
+      message: msg
+    };
+    fetch( "/api/seller/" + userid + "/order/" + order_id, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
@@ -198,7 +227,7 @@ class ProductList extends React.Component {
     var id = localStorage.getItem("user_id");
     if (id == undefined) message.error("请重新登录");
     else {
-      fetch(baseUrl + "/api/seller/" + id + "/inventory")
+      fetch( "/api/seller/" + id + "/inventory")
         .then(r => r.json())
         .then(r =>
           this.setState({
@@ -217,7 +246,7 @@ class ProductList extends React.Component {
             v.count = count;
             v.price = price;
             fetch(
-              baseUrl +
+              
                 "/api/seller/" +
                 localStorage.getItem("user_id") +
                 "/inventory/" +
@@ -335,7 +364,7 @@ class StockButton extends React.Component<{ Productid: number }, {}> {
         count: this.state.val
       };
       list.push(tmp);
-      fetch(baseUrl + "/api/seller/" + id + "/products", {
+      fetch( "/api/seller/" + id + "/products", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
@@ -382,7 +411,7 @@ class Stock extends React.Component {
     }[];
   };
   componentWillMount() {
-    fetch(baseUrl + "/api/seller/baseProducts")
+    fetch( "/api/seller/baseProducts")
       .then(response => response.json())
       .then(r => {
         this.setState({
@@ -442,7 +471,7 @@ class StockList extends React.Component {
       <OrderInfomationList
         fetch={() =>
           fetch(
-            baseUrl +
+            
               "/api/seller/" +
               localStorage.getItem("user_id") +
               "/stock"

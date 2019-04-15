@@ -3,7 +3,6 @@ import "./App.css";
 import { Layout, Menu, Affix } from "antd";
 import { Item } from "./Item";
 import { ShoppingCartAffix } from "./ShoppingCart";
-import { baseUrl } from "./Setting";
 
 const { Header, Footer, Sider, Content } = Layout;
 
@@ -99,7 +98,7 @@ export class MainPage extends React.Component {
   }
 
   componentWillMount() {
-    fetch(baseUrl + "/api/products/category")
+    fetch( "/api/products/category")
       .then((response: any) => response.json())
       .then((d: any) => {
         this.setState({

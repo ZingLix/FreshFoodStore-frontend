@@ -13,7 +13,7 @@ import {
   Collapse
 } from "antd";
 import { number } from "prop-types";
-import { baseUrl } from "./Setting";
+
 import { OrderDetail } from "./View";
 
 const SubMenu = Menu.SubMenu;

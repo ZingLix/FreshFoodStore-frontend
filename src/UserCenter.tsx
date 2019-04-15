@@ -17,7 +17,7 @@ import {
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
 import { OrderInfomationList } from "./OrderInfomation";
-import { baseUrl } from "./Setting";
+
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 
@@ -83,7 +83,7 @@ class OrderInfomation extends React.Component {
               message.warn("请重新登录");
               return {};
             } else
-              return fetch(baseUrl + "/api/user/" + user_id + "/order").then(
+              return fetch( "/api/user/" + user_id + "/order").then(
                 r => r.json()
               );
           }}
