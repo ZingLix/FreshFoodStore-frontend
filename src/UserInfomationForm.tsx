@@ -64,7 +64,7 @@ class UserInfoForm extends React.Component<Props, {}> {
     var id = localStorage.getItem("user_id");
     if (id == null) message.error("请重新登录");
     else
-      fetch( "/api/user/" + id + "/info")
+      fetch("/api/user/" + id + "/info")
         .then(r => {
           return r.json();
         })
@@ -87,7 +87,7 @@ class UserInfoForm extends React.Component<Props, {}> {
         phone: form.getFieldValue("phone"),
         realname: form.getFieldValue("realname")
       };
-      fetch( "/api/user/" + id + "/info", {
+      fetch("/api/user/" + id + "/info", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
@@ -199,12 +199,7 @@ class UserInfoForm extends React.Component<Props, {}> {
         <Form.Item label="真实姓名" labelCol={{ span: 3 }}>
           {getFieldDecorator("realname", {
             rules: []
-          })(
-            <Input
-              addonBefore={prefixSelector}
-              style={{ width: "100%", maxWidth: "500px" }}
-            />
-          )}
+          })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
         </Form.Item>
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit" style={{ float: "left" }}>
