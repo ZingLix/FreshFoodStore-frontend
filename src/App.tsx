@@ -9,35 +9,48 @@ import { UserCenter } from "./UserCenter";
 import { ProductPage } from "./ProductPage";
 import { SellerCenter } from "./SellerCenter";
 import { ShoppingCartAffix, setshoppingcartref } from "./ShoppingCart";
+import { bhistory } from "./index";
 
 const { Header, Footer, Sider, Content } = Layout;
 const Search = Input.Search;
 
 class App extends React.Component {
-  state = {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loginWindow: {
+        visible: false,
+        loading: false
+      },
+      login: false
+    };
+  }
+  state: {
     loginWindow: {
-      visible: false,
-      loading: false
-    }
+      visible: boolean;
+      loading: boolean;
+    };
+    login: boolean;
   };
-
+  componentDidMount() {
+    this.refreshLoginStatus();
+  }
   loginWindowOpen = () => {
     this.loginWindow.open();
+  };
+
+  logout = () => {
+    localStorage.removeItem("user_type");
+    localStorage.removeItem("user_id");
+    this.refreshLoginStatus();
+    bhistory.push("/");
+    window.location.reload();
   };
 
   menu = (
     <Menu>
       <Menu.Item style={{ width: "120px", textAlign: "center" }}>
-        <a onClick={this.loginWindowOpen}>登陆</a>
-      </Menu.Item>
-      <Menu.Item style={{ width: "120px", textAlign: "center" }}>
-        <Link to="/userCenter">个人中心</Link>
-      </Menu.Item>
-      <Menu.Item style={{ width: "120px", textAlign: "center" }}>
-        <Link to="/sellerCenter">卖家中心</Link>
-      </Menu.Item>
-      <Menu.Item style={{ width: "120px", textAlign: "center" }}>
-        <Link to="/baseCenter">采买基地</Link>
+        <a onClick={this.logout}>注销</a>
       </Menu.Item>
     </Menu>
   );
@@ -51,6 +64,20 @@ class App extends React.Component {
   );
 
   private loginWindow;
+
+  refreshLoginStatus = () => {
+    var type = localStorage.getItem("user_type");
+    if (type == undefined) this.setState({ login: true });
+    else this.setState({ login: false });
+  };
+
+  clickAvatar = () => {
+    var type = localStorage.getItem("user_type");
+    if (type == undefined) this.loginWindowOpen();
+    else if (type == "1") bhistory.push("/userCenter");
+    else if (type == "2") bhistory.push("/sellerCenter");
+    else if (type == "3") bhistory.push("/baseCenter");
+  };
 
   public render() {
     return (
@@ -94,9 +121,15 @@ class App extends React.Component {
                 </div>
               </div>
             </Link>
-            <div style={{ float: "right" }}>
-              <Dropdown overlay={this.menu}>
-                <Avatar size={40} icon="user" style={{ marginRight: "12px" }} />
+            <div style={{ float: "right", cursor: "pointer" }}>
+              <Dropdown overlay={this.menu} disabled={this.state.login}>
+                <div onClick={this.clickAvatar}>
+                  <Avatar
+                    size={40}
+                    icon="user"
+                    style={{ marginRight: "12px" }}
+                  />
+                </div>
               </Dropdown>
               <LoginWindow
                 ref={r => {
@@ -140,7 +173,7 @@ class App extends React.Component {
             <Route path="/product/:id" component={ProductPage} />
             <Route path="/sellerCenter" component={SellerCenter} />
             <Route path="/baseCenter" component={BaseCenter} />
-            <ShoppingCartAffix ref={setshoppingcartref}/>
+            <ShoppingCartAffix ref={setshoppingcartref} />
           </Content>
           <Footer style={{ textAlign: "center" }} />
         </Layout>

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Form, Icon, Input, Button, Checkbox, message } from "antd";
 import { WrappedFormUtils } from "antd/lib/form/Form";
 import "./App.css";
-
+import { bhistory } from "./index";
 interface Props {
   form: WrappedFormUtils;
 }
@@ -35,7 +35,7 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
   }
 
   login = e => {
-    fetch( "/api/user/login", {
+    fetch("/api/user/login", {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
@@ -45,8 +45,13 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
     }).then(response => {
       if (response.status == 200) {
         response.json().then(r => {
-          message.success("登录成功" + r.id);
+          message.success("登录成功");
           localStorage.setItem("user_id", r.id);
+          localStorage.setItem("user_type", r.type);
+          setTimeout(() => {
+            bhistory.push("/");
+            window.location.reload();
+          }, 1000);
         });
       } else {
         response.json().then(r => message.error(r.msg));
@@ -55,7 +60,7 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
   };
 
   register = e => {
-    fetch( "/api/user", {
+    fetch("/api/user", {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
