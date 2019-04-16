@@ -15,7 +15,8 @@ import {
   Row,
   Modal,
   message,
-  Input
+  Input,
+  Empty
 } from "antd";
 import { number } from "prop-types";
 
@@ -66,8 +67,10 @@ export class OrderInfomationList extends React.Component<
   };
 
   renderList = status => {
-    return this.state.orderList.map(item => {
+    var count = 0;
+    var tmp = this.state.orderList.map(item => {
       if (item.status == status) {
+        count++;
         return (
           <div key={item.id}>
             <Order order={item} seller={this.props.seller} />
@@ -77,6 +80,8 @@ export class OrderInfomationList extends React.Component<
         return "";
       }
     });
+    if (count == 0) return <Empty description={"暂无订单"} />;
+    else return tmp;
   };
 
   public render() {
@@ -275,16 +280,17 @@ class OrderModal extends React.Component<OrderInfo, {}> {
               <br />
               地址：{order.address}
               <br />
-              联系电话:{order.phone}
+              联系电话：{order.phone}
               <br />
               下单时间：{order.time}
               <br />
               <span>
-                <div>状态:</div>
-                {order.status == 1 && <div>待付款</div>}
-                {order.status == 2 && <div>待发货</div>}
-                {order.status == 3 && <div>配送中</div>}
-                {order.status == 4 && <div>已完成</div>}
+                <div>
+                  {order.status == 1 && <div>状态：待付款</div>}
+                  {order.status == 2 && <div>状态：待发货</div>}
+                  {order.status == 3 && <div>状态：配送中</div>}
+                  {order.status == 4 && <div>状态：已完成</div>}
+                </div>
               </span>
               <Title level={4} style={{ marginTop: "10px" }}>
                 商家信息
@@ -293,7 +299,7 @@ class OrderModal extends React.Component<OrderInfo, {}> {
               <br />
               地址：{order.seller_info.address}
               <br />
-              联系电话:{order.seller_info.phone}
+              联系电话：{order.seller_info.phone}
               <br />
             </div>
           </TabPane>

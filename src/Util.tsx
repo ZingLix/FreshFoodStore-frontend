@@ -19,6 +19,12 @@ export class ClickInput extends React.Component<
     inputvalue: string;
   };
 
+  componentWillReceiveProps(props) {
+    this.setState({
+      inputvalue: props.data
+    });
+  }
+
   show = () => {
     this.setState(
       {

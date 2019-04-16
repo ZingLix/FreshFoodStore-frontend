@@ -15,7 +15,8 @@ import {
   Table,
   InputNumber,
   message,
-  Input
+  Input,
+  Empty
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
@@ -124,13 +125,17 @@ class OrderList extends React.Component {
   }
 
   renderOrder(status) {
-    return this.state.order.map(item => {
+    var count = 0;
+    var tmp = this.state.order.map(item => {
       if (item.status == status) {
+        count++;
         return <Order key={item.id} order={item} seller={true} />;
       } else {
         return "";
       }
     });
+    if (count == 0) return <Empty description={"暂无订单"} />;
+    else return tmp;
   }
 
   public render() {

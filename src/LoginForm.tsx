@@ -35,45 +35,51 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
   }
 
   login = e => {
-    fetch("/api/user/login", {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: JSON.stringify(this.state.request)
-    }).then(response => {
-      if (response.status == 200) {
-        response.json().then(r => {
-          message.success("登录成功");
-          localStorage.setItem("user_id", r.id);
-          localStorage.setItem("user_type", r.type);
-          setTimeout(() => {
-            bhistory.push("/");
-            window.location.reload();
-          }, 1000);
-        });
-      } else {
-        response.json().then(r => message.error(r.msg));
-      }
-    });
+    if (this.state.request.username == "" || this.state.request.password == "")
+      message.warn("用户名和密码不能为空");
+    else
+      fetch("/api/user/login", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(this.state.request)
+      }).then(response => {
+        if (response.status == 200) {
+          response.json().then(r => {
+            message.success("登录成功");
+            localStorage.setItem("user_id", r.id);
+            localStorage.setItem("user_type", r.type);
+            setTimeout(() => {
+              bhistory.push("/");
+              window.location.reload();
+            }, 1000);
+          });
+        } else {
+          response.json().then(r => message.error(r.msg));
+        }
+      });
   };
 
   register = e => {
-    fetch("/api/user", {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: JSON.stringify(this.state.request)
-    }).then(response => {
-      if (response.status == 200) {
-        var j = response.json().then(r => message.success(r.msg));
-      } else {
-        message.error(response.json().then(r => r.msg));
-      }
-    });
+    if (this.state.request.username == "" || this.state.request.password == "")
+      message.warn("用户名和密码不能为空");
+    else
+      fetch("/api/user", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(this.state.request)
+      }).then(response => {
+        if (response.status == 200) {
+          var j = response.json().then(r => message.success(r.msg));
+        } else {
+          message.error(response.json().then(r => r.msg));
+        }
+      });
   };
 
   render() {

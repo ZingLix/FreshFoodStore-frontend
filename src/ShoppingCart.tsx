@@ -304,17 +304,14 @@ export class ShoppingCartAffix extends React.Component {
         address: info.address,
         phone: info.phone
       };
-      fetch(
-         "/api/order/" + this.state.inventory[item[0].id].sellerId,
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          },
-          method: "POST",
-          body: JSON.stringify(request)
-        }
-      );
+      fetch("/api/order/" + this.state.inventory[item[0].id].sellerId, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(request)
+      });
       //console.log(this.state.inventory[item[0].id].sellerId);
     });
     let secondsToGo = 5;
@@ -349,7 +346,7 @@ export class ShoppingCartAffix extends React.Component {
             phone: "...",
             address: "..."
           });
-          fetch(  "/api/user/" + i + "/info")
+          fetch("/api/user/" + i + "/info")
             .then(r => r.json())
             .then(r => {
               this.addSellerInfo(i, r);
@@ -365,7 +362,7 @@ export class ShoppingCartAffix extends React.Component {
               price: 0,
               time: "..."
             });
-            fetch( "/api/inventory/" + item.id)
+            fetch("/api/inventory/" + item.id)
               .then(r => r.json())
               .then(r => {
                 this.addInventoryInfo(item.id, r);
@@ -377,7 +374,7 @@ export class ShoppingCartAffix extends React.Component {
                     category_id: 0,
                     img: ""
                   });
-                  fetch( "/api/products/" + r.productId)
+                  fetch("/api/products/" + r.productId)
                     .then(r => r.json())
                     .then(res => this.addProductInfo(r.productId, res));
                 }
@@ -479,6 +476,16 @@ export class ShoppingCartAffix extends React.Component {
     });
   }
 
+  totalprice = () => {
+    var price = 0;
+    Object.values(this.state.shoppingcart).map((item: any) => {
+      for (var i of item) {
+        price += i.count * this.state.inventory[i.id].price;
+      }
+    });
+    return price;
+  };
+
   cartcount = () => {
     var count = 0;
     Object.values(this.state.shoppingcart).map(item => {
@@ -553,7 +560,7 @@ export class ShoppingCartAffix extends React.Component {
           >
             <Row gutter={16} type="flex" justify="end">
               <Col span={6}>
-                <div>总价：...</div>
+                <div>总价：{this.totalprice()} 元</div>
               </Col>
               <Col span={6}>
                 <Button
