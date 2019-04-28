@@ -18,9 +18,8 @@ import {
   Badge,
   message
 } from "antd";
-import "./App.css";
-import { Product } from "./View";
-import { ClickInput } from "./Util";
+import { Product } from "../Util/View";
+import { ClickInput } from "../Util/ClickInput";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;

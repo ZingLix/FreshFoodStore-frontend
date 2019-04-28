@@ -1,9 +1,8 @@
 import * as React from "react";
-import "./App.css";
 import { Layout, Menu, Affix } from "antd";
 import { Item } from "./Item";
-import { ShoppingCartAffix } from "./ShoppingCart";
-import { Product } from "./View";
+import { ShoppingCartAffix } from "../Component/ShoppingCart";
+import { Product } from "../Util/View";
 
 const { Header, Footer, Sider, Content } = Layout;
 

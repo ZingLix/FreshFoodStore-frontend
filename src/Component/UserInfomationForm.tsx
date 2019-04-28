@@ -19,40 +19,6 @@ const AutoCompleteOption = AutoComplete.Option;
 interface Props {
   form: WrappedFormUtils;
 }
-const residences = [
-  {
-    value: "zhejiang",
-    label: "Zhejiang",
-    children: [
-      {
-        value: "hangzhou",
-        label: "Hangzhou",
-        children: [
-          {
-            value: "xihu",
-            label: "West Lake"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    value: "jiangsu",
-    label: "Jiangsu",
-    children: [
-      {
-        value: "nanjing",
-        label: "Nanjing",
-        children: [
-          {
-            value: "zhonghuamen",
-            label: "Zhong Hua Men"
-          }
-        ]
-      }
-    ]
-  }
-];
 
 class UserInfoForm extends React.Component<Props, {}> {
   state = {
@@ -169,17 +135,6 @@ class UserInfoForm extends React.Component<Props, {}> {
           {getFieldDecorator("nickname", {
             rules: []
           })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
-        </Form.Item>
-        <Form.Item label="地址" labelCol={{ span: 3 }}>
-          {getFieldDecorator("residence", {
-            initialValue: ["zhejiang", "hangzhou", "xihu"],
-            rules: []
-          })(
-            <Cascader
-              options={residences}
-              style={{ width: "100%", maxWidth: "500px" }}
-            />
-          )}
         </Form.Item>
         <Form.Item label="详细地址" labelCol={{ span: 3 }}>
           {getFieldDecorator("address", {

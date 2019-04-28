@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card, Icon, Avatar } from "antd";
 import { Link } from "react-router-dom";
-import { Product } from "./View";
+import { Product } from "../Util/View";
 
 const { Meta } = Card;
 

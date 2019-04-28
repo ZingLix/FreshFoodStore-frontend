@@ -44,3 +44,12 @@ export interface UserInfo {
   realname:string;
   phone: string;
 }
+
+export interface InventoryItem {
+  id: number;
+  sellerId: number;
+  productId: number;
+  count: number;
+  price: number;
+  time: string;
+}

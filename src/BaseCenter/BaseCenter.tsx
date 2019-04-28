@@ -1,5 +1,5 @@
 import * as React from "react";
-import "./App.css";
+import "../App.css";
 import {
   Layout,
   Menu,
@@ -25,9 +25,9 @@ import {
   Modal
 } from "antd";
 import { Route, Link } from "react-router-dom";
-import { UserInfomationForm } from "./UserInfomationForm";
-import { Order, OrderInfomationList } from "./OrderInfomation";
-import { OrderDetail } from "./View";
+import { UserInfomationForm } from "../Component/UserInfomationForm";
+import { Order, OrderInfomationList } from "../Component/OrderInfomation";
+import { OrderDetail } from "../Util/View";
 import Column from "antd/lib/table/Column";
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -113,7 +113,7 @@ class Product extends React.Component {
   private form;
 
   componentWillMount() {
-    fetch( "/api/products/category")
+    fetch("/api/products/category")
       .then((response: any) => response.json())
       .then((d: any) => {
         var tmp = {};
@@ -124,7 +124,7 @@ class Product extends React.Component {
           category: tmp
         });
       });
-    fetch( "/api/base/inventory")
+    fetch("/api/base/inventory")
       .then((Response: any) => Response.json())
       .then((r: any) => {
         this.setState({
@@ -230,7 +230,7 @@ class ProductInfoForm extends React.Component {
 
   public submit() {
     if (this.state.productinfo.id == 0) {
-      fetch( "/api/base/inventory", {
+      fetch("/api/base/inventory", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
@@ -239,7 +239,7 @@ class ProductInfoForm extends React.Component {
         body: JSON.stringify(this.state.productinfo)
       });
     } else {
-      fetch( "/api/base/inventory/" + this.state.productinfo.id, {
+      fetch("/api/base/inventory/" + this.state.productinfo.id, {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
@@ -377,7 +377,7 @@ class Category extends React.Component {
 
   handleInputConfirm = () => {
     if (this.state.inputValue != "") {
-      fetch( "/api/products/category", {
+      fetch("/api/products/category", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
@@ -402,7 +402,7 @@ class Category extends React.Component {
   };
 
   getCategory() {
-    fetch( "/api/products/category")
+    fetch("/api/products/category")
       .then((response: any) => response.json())
       .then(r => {
         this.setState({
@@ -412,7 +412,7 @@ class Category extends React.Component {
   }
 
   deleteCategory(id) {
-    fetch( "/api/products/category/" + id, {
+    fetch("/api/products/category/" + id, {
       method: "DELETE"
     });
   }
@@ -470,7 +470,7 @@ class OrderInfo extends React.Component {
   }
 
   componentWillMount() {
-    fetch( "/api/base/orders")
+    fetch("/api/base/orders")
       .then(res => res.json())
       .then(r =>
         this.setState({
@@ -480,7 +480,7 @@ class OrderInfo extends React.Component {
   }
   deliver = record => {
     console.log(record);
-    fetch( "/api/base/orders/" + record.id, {
+    fetch("/api/base/orders/" + record.id, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"

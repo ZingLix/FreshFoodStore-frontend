@@ -1,5 +1,4 @@
 import * as React from "react";
-import "./App.css";
 import {
   Layout,
   Menu,
@@ -16,29 +15,40 @@ import {
   InputNumber,
   message,
   Input,
-  Empty
+  Empty,
+  Form,
+  Select,
+  Modal
 } from "antd";
 import { Route, Link } from "react-router-dom";
-import { UserInfomationForm } from "./UserInfomationForm";
-import { Order, OrderInfomationList } from "./OrderInfomation";
-import { OrderDetail } from "./View";
-import { ClickInput } from "./Util";
+import { UserInfomationForm } from "../Component/UserInfomationForm";
+import { Order, OrderInfomationList } from "../Component/OrderInfomation";
+import { OrderDetail } from "../Util/View";
+import { ClickInput } from "../Util/ClickInput";
+import { FundGadget } from 'src/Component/Fund';
 
 const { Search } = Input;
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const TabPane = Tabs.TabPane;
 
+
 class Overview extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "用户名"
+      username: "用户名",
+      fund: 0,
+      visible: false,
+      topupvalue: 0
     };
   }
 
   state: {
     username: string;
+    fund: number;
+    visible: boolean;
+    topupvalue: number;
   };
 
   componentWillMount() {
@@ -55,7 +65,9 @@ class Overview extends React.Component {
         );
     }
   }
+ 
   public render() {
+
     return (
       <div>
         <Row type="flex" align="middle" style={{ marginTop: "60px" }}>
@@ -71,10 +83,7 @@ class Overview extends React.Component {
         </Row>
         <Row gutter={16} style={{ marginTop: "16px" }}>
           <Col span={4}>
-            <Statistic title="余额 (RMB)" value={342} precision={2} />
-            <Button style={{ marginTop: 16 }} type="primary">
-              充值
-            </Button>
+            <FundGadget></FundGadget>
           </Col>
           <Col span={4}>
             <Statistic title="待发货订单" value={4} />
@@ -84,6 +93,7 @@ class Overview extends React.Component {
           </Col>
         </Row>
         <Divider />
+        
         <UserInfomationForm />
       </div>
     );
@@ -332,9 +342,10 @@ class StockButton extends React.Component<{ Productid: number }, {}> {
         },
         method: "POST",
         body: JSON.stringify(list)
-      })
-        .then(res => res.json())
-        .then(r => console.log(r));
+      }).then(res => {
+        if (res.status == 400) res.json().then(r => message.error(r.msg));
+        else res.json().then(message.success("下单成功！"));
+      });
     }
   };
 

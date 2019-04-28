@@ -1,5 +1,4 @@
 import * as React from "react";
-import "./App.css";
 import {
   Layout,
   Typography,
@@ -18,9 +17,8 @@ import {
   Input,
   Empty
 } from "antd";
-import { number } from "prop-types";
 
-import { OrderDetail } from "./View";
+import { OrderDetail } from "../Util/View";
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;

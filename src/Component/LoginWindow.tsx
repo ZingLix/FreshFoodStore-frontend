@@ -1,14 +1,18 @@
 import * as React from "react";
-import { Form, Icon, Input, Button, Checkbox, message } from "antd";
+import {
+  Button,
+  Modal,
+  Form,
+  Icon,
+  Input,
+  Checkbox,
+  message
+} from "antd";
+import { bhistory } from "../index";
 import { WrappedFormUtils } from "antd/lib/form/Form";
-import "./App.css";
-import { bhistory } from "./index";
+
 interface Props {
   form: WrappedFormUtils;
-}
-
-function hasErrors(fieldsError) {
-  return Object.keys(fieldsError).some(field => fieldsError[field]);
 }
 
 class HorizontalLoginForm extends React.Component<Props, {}> {
@@ -144,6 +148,46 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
   }
 }
 
-export const WrappedHorizontalLoginForm = Form.create({
+const WrappedHorizontalLoginForm = Form.create({
   name: "horizontal_login"
 })(HorizontalLoginForm);
+
+export class LoginWindow extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      loading: false
+    };
+  }
+  state = {
+    visible: false,
+    loading: false
+  };
+
+  private loginWindowCancel = () => {
+    this.setState({
+      visible: false,
+      loading: false
+    });
+  };
+
+  public open = () => {
+    this.setState({
+      visible: true
+    });
+  };
+
+  public render() {
+    return (
+      <Modal
+        visible={this.state.visible}
+        title="登陆"
+        onCancel={this.loginWindowCancel}
+        footer={null}
+      >
+        <WrappedHorizontalLoginForm />
+      </Modal>
+    );
+  }
+}

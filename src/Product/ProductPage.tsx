@@ -1,17 +1,8 @@
 import * as React from "react";
 import { Row, Col, Typography, List, Button, Breadcrumb, Icon } from "antd";
-import { Product, UserInfo } from "./View";
-import { addItem } from "./ShoppingCart";
+import { Product, UserInfo,InventoryItem } from "../Util/View";
+import { addItem } from "../Component/ShoppingCart";
 const { Title } = Typography;
-
-interface InventoryItem {
-  id: number;
-  sellerId: number;
-  productId: number;
-  count: number;
-  price: number;
-  time: string;
-}
 
 interface InventoryInfo {
   sellerId: number;

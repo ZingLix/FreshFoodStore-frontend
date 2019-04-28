@@ -2,59 +2,21 @@ import * as React from "react";
 import "./App.css";
 import { Layout, Menu, Icon, Avatar, Dropdown, Popover, Input } from "antd";
 import { Route, Link } from "react-router-dom";
-import { LoginWindow } from "./LoginWindow";
-import { MainPage } from "./MainPage";
-import { BaseCenter } from "./BaseCenter";
-import { UserCenter } from "./UserCenter";
-import { ProductPage } from "./ProductPage";
-import { SellerCenter } from "./SellerCenter";
-import { ShoppingCartAffix, setshoppingcartref } from "./ShoppingCart";
-import { bhistory } from "./index";
+import { MainPage } from "./MainPage/MainPage";
+import { BaseCenter } from "./BaseCenter/BaseCenter";
+import { UserCenter } from "./BuyerCenter/UserCenter";
+import { ProductPage } from "./Product/ProductPage";
+import { SellerCenter } from "./SellerCenter/SellerCenter";
+import {
+  ShoppingCartAffix,
+  setshoppingcartref
+} from "./Component/ShoppingCart";
+import { LoginAvatar } from "./Component/Avatar";
 
 const { Header, Footer, Sider, Content } = Layout;
 const Search = Input.Search;
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loginWindow: {
-        visible: false,
-        loading: false
-      },
-      login: false
-    };
-  }
-  state: {
-    loginWindow: {
-      visible: boolean;
-      loading: boolean;
-    };
-    login: boolean;
-  };
-  componentDidMount() {
-    this.refreshLoginStatus();
-  }
-  loginWindowOpen = () => {
-    this.loginWindow.open();
-  };
-
-  logout = () => {
-    localStorage.removeItem("user_type");
-    localStorage.removeItem("user_id");
-    this.refreshLoginStatus();
-    bhistory.push("/");
-    window.location.reload();
-  };
-
-  menu = (
-    <Menu>
-      <Menu.Item style={{ width: "120px", textAlign: "center" }}>
-        <a onClick={this.logout}>注销</a>
-      </Menu.Item>
-    </Menu>
-  );
-
   search = (
     <Search
       placeholder="input search text"
@@ -62,22 +24,6 @@ class App extends React.Component {
       enterButton
     />
   );
-
-  private loginWindow;
-
-  refreshLoginStatus = () => {
-    var type = localStorage.getItem("user_type");
-    if (type == undefined) this.setState({ login: true });
-    else this.setState({ login: false });
-  };
-
-  clickAvatar = () => {
-    var type = localStorage.getItem("user_type");
-    if (type == undefined) this.loginWindowOpen();
-    else if (type == "1") bhistory.push("/userCenter");
-    else if (type == "2") bhistory.push("/sellerCenter");
-    else if (type == "3") bhistory.push("/baseCenter");
-  };
 
   public render() {
     return (
@@ -121,22 +67,10 @@ class App extends React.Component {
                 </div>
               </div>
             </Link>
-            <div style={{ float: "right", cursor: "pointer" }}>
-              <Dropdown overlay={this.menu} disabled={this.state.login}>
-                <div onClick={this.clickAvatar}>
-                  <Avatar
-                    size={40}
-                    icon="user"
-                    style={{ marginRight: "12px" }}
-                  />
-                </div>
-              </Dropdown>
-              <LoginWindow
-                ref={r => {
-                  this.loginWindow = r;
-                }}
-              />
-            </div>{" "}
+            <div style={{ float: "right" }}>
+              {" "}
+              <LoginAvatar />
+            </div>
             <div
               style={{
                 float: "right",
