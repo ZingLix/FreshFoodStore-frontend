@@ -11,8 +11,9 @@ import {
   Avatar,
   Divider,
   Affix,
-  Anchor,
-  message
+  Modal,
+  message,
+  Form,InputNumber,Select
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "./UserInfomationForm";
@@ -20,17 +21,23 @@ import { OrderInfomationList } from "./OrderInfomation";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
-
+const Option = Select.Option;
 class Overview extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "用户名"
+      username: "用户名",
+      visible:false,
+      topupvalue:0,
+      fund:0
     };
   }
 
   state: {
     username: string;
+    visible:boolean;
+    topupvalue:number;
+    fund:number;
   };
 
   componentWillMount() {
@@ -45,10 +52,64 @@ class Overview extends React.Component {
             username: r.nickname
           })
         );
+        this.refreshFund();
     }
   }
+topup=()=>{
+  var userid = localStorage.getItem("user_id");
+    if (userid == undefined) {
+      message.warn("请重新登陆");
+    }else{
 
+      fetch("/api/fund/"+userid,{
+        method:"POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId:userid,
+          operation:1,
+          count:this.state.topupvalue
+        })
+      }).then(r=>r.json())
+      .then(r=>{message.success(r.msg);this.refreshFund();})
+      this.hide();
+      
+    }
+}
+refreshFund=()=>{
+  var userid = localStorage.getItem("user_id");
+  if (userid == undefined) {
+    message.warn("请重新登陆");
+  } else {
+  fetch("/api/fund/"+userid)
+  .then(r=>r.json())
+  .then(r=>this.setState({
+    fund:r.count
+  }))}
+}
+
+show=()=>{
+  this.setState({
+    visible:true
+  })
+}
+hide=()=>{
+  this.setState({
+    visible:false
+  })
+}
+handleNumberChange=(num)=>{
+  this.setState({
+    topupvalue:num
+  })
+}
   public render() {
+    const formItemLayout = {
+      labelCol: { span: 7 },
+      wrapperCol: { span: 12 },
+    };
     return (
       <div>
         <Row type="flex" align="middle" style={{ marginTop: "60px" }}>
@@ -64,8 +125,8 @@ class Overview extends React.Component {
         </Row>
         <Row gutter={16} style={{ marginTop: "16px" }}>
           <Col span={4}>
-            <Statistic title="余额 (RMB)" value={342} precision={2} />
-            <Button style={{ marginTop: 16 }} type="primary">
+            <Statistic title="余额 (RMB)" value={this.state.fund} precision={2} />
+            <Button style={{ marginTop: 16 }} type="primary" onClick={this.show}>
               充值
             </Button>
           </Col>
@@ -79,6 +140,34 @@ class Overview extends React.Component {
             <Statistic title="待评价订单" value={2} />
           </Col>
         </Row>
+        <Modal
+          title="充值"
+          visible={this.state.visible}
+          onOk={this.topup}
+          onCancel={this.hide}
+        >
+                <Form>
+        <Form.Item
+          {...formItemLayout}
+          label="金额"
+        >
+          <InputNumber
+            value={this.state.topupvalue}
+            onChange={this.handleNumberChange}
+            style={{ width: 160 }}
+          />
+        </Form.Item>
+        <Form.Item
+          {...formItemLayout}
+          label="支付方式"
+        >
+              <Select defaultValue="alipay" style={{ width: 160 }}>
+      <Option value="alipay">支付宝</Option>
+      <Option value="wechat">微信</Option>
+    </Select>
+        </Form.Item>
+      </Form>
+        </Modal>
       </div>
     );
   }
