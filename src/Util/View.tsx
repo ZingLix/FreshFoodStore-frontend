@@ -53,3 +53,13 @@ export interface InventoryItem {
   price: number;
   time: string;
 }
+
+export interface FundItem{
+  id:number;
+  userId:number;
+  time:string;
+  type:number;
+  reason:number;
+  orderId:number;
+  msg:string;
+}

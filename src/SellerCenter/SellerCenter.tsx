@@ -25,7 +25,7 @@ import { UserInfomationForm } from "../Component/UserInfomationForm";
 import { Order, OrderInfomationList } from "../Component/OrderInfomation";
 import { OrderDetail } from "../Util/View";
 import { ClickInput } from "../Util/ClickInput";
-import { FundGadget } from 'src/Component/Fund';
+import { FundGadget, FundList } from 'src/Component/Fund';
 
 const { Search } = Input;
 const { Header, Footer, Sider, Content } = Layout;
@@ -481,6 +481,9 @@ export class SellerCenter extends React.Component {
               <Menu.Item key="5">
                 <Link to="/sellerCenter/stockList">进货管理</Link>
               </Menu.Item>
+              <Menu.Item key="6">
+                <Link to="/sellerCenter/fund">资金变动</Link>
+              </Menu.Item>
             </Menu>
           </Affix>
         </Sider>
@@ -492,6 +495,7 @@ export class SellerCenter extends React.Component {
           <Route path="/sellerCenter/order" component={OrderList} />
           <Route path="/sellerCenter/stock" component={Stock} />
           <Route path="/sellerCenter/stockList" component={StockList} />
+          <Route path="/sellerCenter/fund" component={FundList} />
         </Content>
       </Layout>
     );

@@ -19,7 +19,7 @@ import {
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "../Component/UserInfomationForm";
 import { OrderInfomationList } from "../Component/OrderInfomation";
-import { FundGadget } from 'src/Component/Fund';
+import { FundGadget, FundList } from 'src/Component/Fund';
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -150,6 +150,9 @@ export class UserCenter extends React.Component {
               <Menu.Item key="2">
                 <Link to="/userCenter/orderInfomation">订单管理</Link>
               </Menu.Item>
+              <Menu.Item key="3">
+                <Link to="/userCenter/fund">资金变动</Link>
+              </Menu.Item>
             </Menu>
           </Affix>
         </Sider>
@@ -166,6 +169,10 @@ export class UserCenter extends React.Component {
           <Route
             path="/userCenter/orderInfomation"
             component={OrderInfomation}
+          />
+          <Route
+            path="/userCenter/fund"
+            component={FundList}
           />
         </Content>
       </Layout>

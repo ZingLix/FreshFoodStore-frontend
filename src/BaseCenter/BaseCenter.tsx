@@ -29,6 +29,7 @@ import { UserInfomationForm } from "../Component/UserInfomationForm";
 import { Order, OrderInfomationList } from "../Component/OrderInfomation";
 import { OrderDetail } from "../Util/View";
 import Column from "antd/lib/table/Column";
+import { FundList } from 'src/Component/Fund';
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const TabPane = Tabs.TabPane;
@@ -594,6 +595,9 @@ export class BaseCenter extends React.Component {
               <Menu.Item key="3">
                 <Link to="/baseCenter/order">进货信息</Link>
               </Menu.Item>
+              <Menu.Item key="4">
+                <Link to="/baseCenter/fund">资金变动</Link>
+              </Menu.Item>
             </Menu>
           </Affix>
         </Sider>
@@ -607,6 +611,7 @@ export class BaseCenter extends React.Component {
           <Route exact path="/baseCenter" component={Product} />
           <Route exact path="/baseCenter/category" component={Category} />
           <Route path="/baseCenter/order" component={OrderInfo} />
+          <Route path="/baseCenter/fund" component={FundList} />
         </Content>
       </Layout>
     );
