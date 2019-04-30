@@ -20,6 +20,7 @@ import {
 } from "antd";
 
 import { OrderDetail } from "../Util/View";
+import { formatTime } from "../Util/Util";
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
@@ -71,7 +72,8 @@ export class OrderInfomationList extends React.Component<
   renderList = status => {
     var render = () => {
       var count = 0;
-      var tmp = this.state.orderList.reverse().map(item => {
+      var arr = this.state.orderList.reverse();
+      var tmp = arr.map(item => {
         if (item.status == status) {
           count++;
           return (
@@ -294,7 +296,7 @@ class OrderModal extends React.Component<OrderInfo, {}> {
               <br />
               联系电话：{order.phone}
               <br />
-              下单时间：{order.time}
+              下单时间：{formatTime(order.time)}
               <br />
               <span>
                 <div>
@@ -376,7 +378,7 @@ export class Order extends React.Component<OrderInfo, {}> {
       <Timeline style={{ margin: "12px 12px 0px 12px" }}>
         {this.props.order.delivery_info.map(d => (
           <Timeline.Item key={d.time} style={{ paddingBottom: "10px" }}>
-            {d.time}
+            {formatTime(d.time)}
             <br />
             {d.info}
           </Timeline.Item>
@@ -397,7 +399,7 @@ export class Order extends React.Component<OrderInfo, {}> {
     var Order = this.props.order;
     return (
       <Card
-        title={Order.time}
+        title={formatTime(Order.time)}
         extra={this.renderDeliveryInfo()}
         style={{ width: "100%", marginTop: "4px" }}
       >

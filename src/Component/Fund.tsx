@@ -20,7 +20,7 @@ import {
   Select,
   Modal
 } from "antd";
-import { getUserId } from "../Util/Util";
+import { getUserId, formatTime } from "../Util/Util";
 import { FundItem } from "src/Util/View";
 
 const Option = Select.Option;
@@ -287,7 +287,8 @@ export class FundList extends React.Component {
     {
       title: "日期",
       dataIndex: "time",
-      key: "time"
+      key: "time",
+      render: time=><div>{formatTime(time)}</div>
     },
     {
       title: "变动情况",

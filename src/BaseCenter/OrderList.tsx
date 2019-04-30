@@ -26,6 +26,8 @@ import {
   message
 } from "antd";
 import { OrderDetail } from "src/Util/View";
+import { format } from "util";
+import { formatTime } from "src/Util/Util";
 
 export class OrderInfo extends React.Component {
   constructor(props) {
@@ -37,18 +39,18 @@ export class OrderInfo extends React.Component {
   }
 
   componentDidMount() {
-      this.refreshOrders();
+    this.refreshOrders();
   }
 
-  refreshOrders(){
-      fetch("/api/base/orders")
-          .then(res => res.json())
-          .then(r =>
-              this.setState({
-                  orders: r.reverse(),
-                  loading: false
-              })
-          );
+  refreshOrders() {
+    fetch("/api/base/orders")
+      .then(res => res.json())
+      .then(r =>
+        this.setState({
+          orders: r.reverse(),
+          loading: false
+        })
+      );
   }
 
   deliver = (record, e) => {
@@ -81,7 +83,8 @@ export class OrderInfo extends React.Component {
     {
       title: "时间",
       key: "time",
-      dataIndex: "time"
+      dataIndex: "time",
+      render: time => <div>{formatTime(time)}</div>
     },
     {
       title: "总价",
