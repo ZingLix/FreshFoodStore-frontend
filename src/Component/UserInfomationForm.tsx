@@ -7,7 +7,7 @@ import {
   Cascader,
   Select,
   Row,
-  Col,
+  Spin,
   message,
   Button,
   AutoComplete
@@ -23,7 +23,8 @@ interface Props {
 class UserInfoForm extends React.Component<Props, {}> {
   state = {
     confirmDirty: false,
-    autoCompleteResult: []
+    autoCompleteResult: [],
+    loading: true
   };
 
   componentDidMount() {
@@ -37,6 +38,9 @@ class UserInfoForm extends React.Component<Props, {}> {
         .then(info => {
           delete info.id;
           this.props.form.setFieldsValue(info);
+          this.setState({
+            loading: false
+          });
         });
   }
 
@@ -60,7 +64,12 @@ class UserInfoForm extends React.Component<Props, {}> {
         },
         method: "POST",
         body: JSON.stringify(reqbody)
-      }).then(message.success("已修改"));
+      }).then(r=>{
+        if(r.status==200)
+        message.success("已修改")
+        else r.json().then(r=>message.warn(r.msg))
+      }
+        );
     }
   };
 
@@ -110,58 +119,60 @@ class UserInfoForm extends React.Component<Props, {}> {
     ));
 
     return (
-      <Form {...formItemLayout} onSubmit={this.handleSubmit}>
-        <Form.Item label="邮箱" labelCol={{ span: 3 }}>
-          {getFieldDecorator("email", {
-            rules: [
-              {
-                required: true,
-                message: "Please input your E-mail!"
-              }
-            ]
-          })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
-        </Form.Item>
-        <Form.Item
-          label={
-            <span>
-              昵称&nbsp;
-              <Tooltip title="What do you want others to call you?">
-                <Icon type="question-circle-o" />
-              </Tooltip>
-            </span>
-          }
-          labelCol={{ span: 3 }}
-        >
-          {getFieldDecorator("nickname", {
-            rules: []
-          })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
-        </Form.Item>
-        <Form.Item label="详细地址" labelCol={{ span: 3 }}>
-          {getFieldDecorator("address", {
-            rules: []
-          })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
-        </Form.Item>
-        <Form.Item label="电话" labelCol={{ span: 3 }}>
-          {getFieldDecorator("phone", {
-            rules: []
-          })(
-            <Input
-              addonBefore={prefixSelector}
-              style={{ width: "100%", maxWidth: "500px" }}
-            />
-          )}
-        </Form.Item>
-        <Form.Item label="真实姓名" labelCol={{ span: 3 }}>
-          {getFieldDecorator("realname", {
-            rules: []
-          })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
-        </Form.Item>
-        <Form.Item {...tailFormItemLayout}>
-          <Button type="primary" htmlType="submit" style={{ float: "left" }}>
-            更新
-          </Button>
-        </Form.Item>
-      </Form>
+      <Spin spinning={this.state.loading}>
+        <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+          <Form.Item label="邮箱" labelCol={{ span: 3 }}>
+            {getFieldDecorator("email", {
+              rules: [
+                {
+                  required: true,
+                  message: "Please input your E-mail!"
+                }
+              ]
+            })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
+          </Form.Item>
+          <Form.Item
+            label={
+              <span>
+                昵称&nbsp;
+                <Tooltip title="What do you want others to call you?">
+                  <Icon type="question-circle-o" />
+                </Tooltip>
+              </span>
+            }
+            labelCol={{ span: 3 }}
+          >
+            {getFieldDecorator("nickname", {
+              rules: []
+            })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
+          </Form.Item>
+          <Form.Item label="详细地址" labelCol={{ span: 3 }}>
+            {getFieldDecorator("address", {
+              rules: []
+            })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
+          </Form.Item>
+          <Form.Item label="电话" labelCol={{ span: 3 }}>
+            {getFieldDecorator("phone", {
+              rules: []
+            })(
+              <Input
+                addonBefore={prefixSelector}
+                style={{ width: "100%", maxWidth: "500px" }}
+              />
+            )}
+          </Form.Item>
+          <Form.Item label="真实姓名" labelCol={{ span: 3 }}>
+            {getFieldDecorator("realname", {
+              rules: []
+            })(<Input style={{ width: "100%", maxWidth: "500px" }} />)}
+          </Form.Item>
+          <Form.Item {...tailFormItemLayout}>
+            <Button type="primary" htmlType="submit" style={{ float: "left" }}>
+              更新
+            </Button>
+          </Form.Item>
+        </Form>
+      </Spin>
     );
   }
 }

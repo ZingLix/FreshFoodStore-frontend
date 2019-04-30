@@ -14,7 +14,8 @@ import {
   message,
   Form,
   InputNumber,
-  Select
+  Select,
+  Spin
 } from "antd";
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "../Component/UserInfomationForm";
@@ -29,11 +30,13 @@ class Overview extends React.Component {
     super(props);
     this.state = {
       username: "用户名",
+      loadingusername: true
     };
   }
 
   state: {
     username: string;
+    loadingusername: boolean;
   };
 
   componentWillMount() {
@@ -45,7 +48,8 @@ class Overview extends React.Component {
         .then(r => r.json())
         .then(r =>
           this.setState({
-            username: r.nickname
+            username: r.nickname,
+            loadingusername: false
           })
         );
     }
@@ -55,6 +59,7 @@ class Overview extends React.Component {
 
     return (
       <div>
+        <Spin spinning={this.state.loadingusername}>
         <Row type="flex" align="middle" style={{ marginTop: "60px" }}>
           <Col>
             <Avatar size={64} icon="user" />
@@ -80,6 +85,7 @@ class Overview extends React.Component {
             <Statistic title="待评价订单" value={2} />
           </Col>
         </Row>
+        </Spin>
       </div>
     );
   }

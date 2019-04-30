@@ -253,31 +253,41 @@ export class FundList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      log: []
+      log: [],
+      loading: true
     };
   }
 
   componentDidMount() {
+    this.refreshData();
+  }
+
+  refreshData = () => {
     var userid = getUserId();
     if (userid == null) return;
+    this.setState({
+      loading: true
+    });
     fetch("/api/fundlog/" + userid)
       .then(r => r.json())
       .then(r =>
         this.setState({
-          log: r.reverse()
+          log: r.reverse(),
+          loading: false
         })
       );
-  }
+  };
 
   state: {
     log: FundItem[];
+    loading: boolean;
   };
 
   columns = [
     {
       title: "日期",
       dataIndex: "time",
-      key: "time",
+      key: "time"
     },
     {
       title: "变动情况",
@@ -300,24 +310,34 @@ export class FundList extends React.Component {
   render() {
     return (
       <div>
-        <Row type="flex" align="middle"><Col span={12}>
-        <Title level={4} style={{ float: "left",marginTop:"16px" }}>
-          变动日志
-        </Title></Col><Col span={12}>
-        <div style={{ float: "right",marginBottom:"0.5em" }}>
-          <WithdrawButton>提现</WithdrawButton>
-        </div>
-        <div style={{ float: "right", marginRight: "10px",marginBottom:"0.5em" }}>
-          <TopupButton>充值</TopupButton>
-        </div>
-        </Col>
+        <Row type="flex" align="middle">
+          <Col span={12}>
+            <Title level={4} style={{ float: "left", marginTop: "16px" }}>
+              变动日志
+            </Title>
+          </Col>
+          <Col span={12}>
+            <div style={{ float: "right", marginBottom: "0.5em" }}>
+              <WithdrawButton onClose={this.refreshData}>提现</WithdrawButton>
+            </div>
+            <div
+              style={{
+                float: "right",
+                marginRight: "10px",
+                marginBottom: "0.5em"
+              }}
+            >
+              <TopupButton onClose={this.refreshData}>充值</TopupButton>
+            </div>
+          </Col>
         </Row>
-        <Divider style={{marginTop:"0"}}/>
+        <Divider style={{ marginTop: "0" }} />
         <Row>
           <Table
             columns={this.columns}
             dataSource={this.state.log}
             rowKey={t => t.id}
+            loading={this.state.loading}
           />
         </Row>
       </div>

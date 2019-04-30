@@ -15,7 +15,8 @@ import {
   Modal,
   message,
   Input,
-  Empty
+  Empty,
+  Skeleton
 } from "antd";
 
 import { OrderDetail } from "../Util/View";
@@ -39,7 +40,8 @@ export class OrderInfomationList extends React.Component<
     super(props);
     this.state = {
       current: "1",
-      orderList: []
+      orderList: [],
+      loading: true
     };
   }
 
@@ -48,7 +50,8 @@ export class OrderInfomationList extends React.Component<
     if (list != {})
       list.then(r => {
         this.setState({
-          orderList: r
+          orderList: r,
+          loading: false
         });
       });
   }
@@ -56,6 +59,7 @@ export class OrderInfomationList extends React.Component<
   state: {
     current: string;
     orderList: OrderDetail[];
+    loading: boolean;
   };
 
   handleClick = e => {
@@ -65,33 +69,43 @@ export class OrderInfomationList extends React.Component<
   };
 
   renderList = status => {
-    var count = 0;
-    var tmp = this.state.orderList.map(item => {
-      if (item.status == status) {
-        count++;
-        return (
-          <div key={item.id}>
-            <Order order={item} seller={this.props.seller} />
-          </div>
-        );
-      } else {
-        return "";
-      }
-    });
-    if (count == 0) return <Empty description={"暂无订单"} />;
-    else return tmp;
+    var render = () => {
+      var count = 0;
+      var tmp = this.state.orderList.reverse().map(item => {
+        if (item.status == status) {
+          count++;
+          return (
+            <div key={item.id}>
+              <Order order={item} seller={this.props.seller} />
+            </div>
+          );
+        } else {
+          return "";
+        }
+      });
+      if (count == 0) return <Empty description={"暂无订单"} />;
+      else return tmp;
+    };
+
+    return (
+      <div>
+        <Skeleton loading={this.state.loading} active>
+          {render()}
+        </Skeleton>
+      </div>
+    );
   };
 
   public render() {
     return (
-      <Tabs defaultActiveKey="1" onChange={this.handleClick}>
+      <Tabs defaultActiveKey="2" onChange={this.handleClick}>
         {/* <TabPane tab="待付款" key="1">
           {this.renderList(1)}
         </TabPane> */}
         <TabPane tab="待发货" key="2">
           {this.renderList(2)}
         </TabPane>
-        <TabPane tab="运输中" key="3">
+        <TabPane tab="配送中" key="3">
           {this.renderList(3)}
         </TabPane>
         <TabPane tab="已完成" key="4">

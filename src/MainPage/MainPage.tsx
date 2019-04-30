@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Layout, Menu, Affix } from "antd";
+import { Layout, Menu, Affix, Spin, Skeleton } from "antd";
 import { Item } from "./Item";
 import { ShoppingCartAffix } from "../Component/ShoppingCart";
 import { Product } from "../Util/View";
@@ -12,21 +12,24 @@ export class MainPage extends React.Component {
     this.state = {
       productCategory: [],
       productList: [],
-      currentCategory: 0
+      currentCategory: 0,
+      loading_category: true,
+      loading_products: true
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     fetch("/api/products/category")
       .then((response: any) => response.json())
       .then((d: any) => {
         this.setState({
-          productCategory: d
+          productCategory: d,
+          loading_category: false
         });
       });
     fetch("/api/products/mainpage")
       .then(r => r.json())
-      .then(r => this.setState({ productList: r }));
+      .then(r => this.setState({ productList: r, loading_products: false }));
   }
 
   state: {
@@ -40,6 +43,8 @@ export class MainPage extends React.Component {
       product: Product;
     }[];
     currentCategory: number;
+    loading_category: boolean;
+    loading_products: boolean;
   };
 
   public render() {
@@ -47,53 +52,57 @@ export class MainPage extends React.Component {
       <div>
         <Layout style={{ padding: "24px 0", background: "#fff" }}>
           <Sider width={200} style={{ background: "#fff" }}>
-            <Menu
-              mode="inline"
-              defaultSelectedKeys={["0"]}
-              defaultOpenKeys={["sub1"]}
-              style={{ height: "100%" }}
-            >
-              <Menu.Item
-                key={0}
-                onClick={() => {
-                  this.setState({ currentCategory: 0 });
-                }}
+            <Spin spinning={this.state.loading_category}>
+              <Menu
+                mode="inline"
+                defaultSelectedKeys={["0"]}
+                defaultOpenKeys={["sub1"]}
+                style={{ height: "100%" }}
               >
-                全部
-              </Menu.Item>
-              {this.state.productCategory.map(c => (
                 <Menu.Item
-                  key={c.id}
+                  key={0}
                   onClick={() => {
-                    this.setState({ currentCategory: c.id });
+                    this.setState({ currentCategory: 0 });
                   }}
                 >
-                  {c.typename}
+                  全部
                 </Menu.Item>
-              ))}
-            </Menu>
+                {this.state.productCategory.map(c => (
+                  <Menu.Item
+                    key={c.id}
+                    onClick={() => {
+                      this.setState({ currentCategory: c.id });
+                    }}
+                  >
+                    {c.typename}
+                  </Menu.Item>
+                ))}
+              </Menu>
+            </Spin>
           </Sider>
           <Content style={{ padding: "0 24px", minHeight: 280 }}>
-            {this.state.productList.map(c => {
-              if (
-                this.state.currentCategory === 0 ||
-                c.product.category_id === this.state.currentCategory
-              ) {
-                return (
-                  <div
-                    style={{
-                      float: "left",
-                      margin: "20px 20px 20px 20px"
-                    }}
-                    key={c.id}
-                  >
-                    <Item data={c} />
-                  </div>
-                );
-              } else {
-                return " ";
-              }
-            })}
+            <Skeleton active loading={this.state.loading_products}>
+              {this.state.productList.map(c => {
+                if (
+                  this.state.currentCategory === 0 ||
+                  c.product.category_id === this.state.currentCategory
+                ) {
+                  return (
+                    <div
+                      style={{
+                        float: "left",
+                        margin: "20px 20px 20px 20px"
+                      }}
+                      key={c.id}
+                    >
+                      <Item data={c} />
+                    </div>
+                  );
+                } else {
+                  return " ";
+                }
+              })}
+            </Skeleton>
           </Content>
         </Layout>
       </div>
