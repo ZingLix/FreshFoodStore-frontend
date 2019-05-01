@@ -43,13 +43,13 @@ export class Item extends React.Component<itemProps, {}> {
             />
           </Link>
         }
-        actions={[
-          <Icon type="star" />,
-          <Link to={"/product/" + this.props.data.id}>
-            <Icon type="ellipsis" />
-          </Link>,
-          <Icon type="shopping-cart" />
-        ]}
+        // actions={[
+        //   <Icon type="star" />,
+        //   <Link to={"/product/" + this.props.data.id}>
+        //     <Icon type="ellipsis" />
+        //   </Link>,
+        //   <Icon type="shopping-cart" />
+        // ]}
       >
         <Meta
           title={this.props.data.product.name}

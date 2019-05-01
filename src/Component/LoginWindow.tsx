@@ -1,13 +1,5 @@
 import * as React from "react";
-import {
-  Button,
-  Modal,
-  Form,
-  Icon,
-  Input,
-  Checkbox,
-  message
-} from "antd";
+import { Button, Modal, Form, Icon, Input, Checkbox, message } from "antd";
 import { bhistory } from "../index";
 import { WrappedFormUtils } from "antd/lib/form/Form";
 
@@ -134,12 +126,12 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
           {getFieldDecorator("remember", {
             valuePropName: "checked",
             initialValue: true
-          })(<Checkbox>记住此次登陆</Checkbox>)}
+          })(<Checkbox>记住此次登录</Checkbox>)}
           <a className="login-form-forgot" href="" style={{ float: "right" }}>
             忘记密码
           </a>
           <Button type="primary" onClick={this.login} style={{ width: "100%" }}>
-            登陆
+            登录
           </Button>
           或者 <Button onClick={this.register}>立即注册!</Button>
         </Form.Item>
@@ -182,7 +174,7 @@ export class LoginWindow extends React.Component {
     return (
       <Modal
         visible={this.state.visible}
-        title="登陆"
+        title="登录"
         onCancel={this.loginWindowCancel}
         footer={null}
       >

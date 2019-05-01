@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Table, message } from "antd";
-import { getUserId } from "src/Util/Util";
+import { getUserId, formatTime } from "src/Util/Util";
 
 import { ClickInput } from "src/Util/ClickInput";
+import { format } from "util";
 
 export class ProductList extends React.Component {
   constructor(props) {
@@ -51,6 +52,7 @@ export class ProductList extends React.Component {
 
   updateItem = (item, count, price) => {
     var tmp = this.state.inventory;
+    if (item.count == count && item.price == price) return;
     for (var u of tmp) {
       if (u.product_id == item.productId) {
         for (var v of u.inventoryList) {
@@ -70,10 +72,10 @@ export class ProductList extends React.Component {
                 method: "POST",
                 body: JSON.stringify(v)
               }
-            ).then(r=>{
-                if(r.status==200) message.success("信息已更新")
-                else r.json().then(r=>message.warn(r.msg))
-            })
+            ).then(r => {
+              if (r.status == 200) message.success("信息已更新");
+              else r.json().then(r => message.warn(r.msg));
+            });
           }
         }
       }
@@ -101,7 +103,8 @@ export class ProductList extends React.Component {
     {
       title: "入库日期",
       dataIndex: "time",
-      key: "time"
+      key: "time",
+      render: time => <div>{formatTime(time)}</div>
     },
     {
       title: "剩余数量",

@@ -138,7 +138,7 @@ export class StockList extends React.Component {
             "/api/seller/" + localStorage.getItem("user_id") + "/stock"
           ).then(r => r.json())
         }
-        seller={true}
+        seller={false}
       />
     );
   }

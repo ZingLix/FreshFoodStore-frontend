@@ -1,11 +1,12 @@
 import * as React from "react";
-import { Layout, Menu, Affix, Spin, Skeleton } from "antd";
+import { Layout, Menu, Typography, Spin, Skeleton, Input, Row } from "antd";
 import { Item } from "./Item";
 import { ShoppingCartAffix } from "../Component/ShoppingCart";
 import { Product } from "../Util/View";
 
 const { Header, Footer, Sider, Content } = Layout;
-
+const { Title } = Typography;
+const Search = Input.Search;
 export class MainPage extends React.Component {
   constructor(props) {
     super(props);
@@ -14,7 +15,9 @@ export class MainPage extends React.Component {
       productList: [],
       currentCategory: 0,
       loading_category: true,
-      loading_products: true
+      loading_products: true,
+      search: false,
+      searchstr: ""
     };
   }
 
@@ -32,6 +35,18 @@ export class MainPage extends React.Component {
       .then(r => this.setState({ productList: r, loading_products: false }));
   }
 
+  public search(str: string) {
+    if (str == "") {
+      this.setState({
+        search: false
+      });
+    } else
+      this.setState({
+        search: true,
+        searchstr: str
+      });
+  }
+
   state: {
     productCategory: {
       id: number;
@@ -45,6 +60,8 @@ export class MainPage extends React.Component {
     currentCategory: number;
     loading_category: boolean;
     loading_products: boolean;
+    search: boolean;
+    searchstr: string;
   };
 
   public render() {
@@ -71,7 +88,10 @@ export class MainPage extends React.Component {
                   <Menu.Item
                     key={c.id}
                     onClick={() => {
-                      this.setState({ currentCategory: c.id });
+                      this.setState({
+                        search: false,
+                        currentCategory: c.id
+                      });
                     }}
                   >
                     {c.typename}
@@ -81,28 +101,58 @@ export class MainPage extends React.Component {
             </Spin>
           </Sider>
           <Content style={{ padding: "0 24px", minHeight: 280 }}>
-            <Skeleton active loading={this.state.loading_products}>
-              {this.state.productList.map(c => {
-                if (
-                  this.state.currentCategory === 0 ||
-                  c.product.category_id === this.state.currentCategory
-                ) {
-                  return (
-                    <div
-                      style={{
-                        float: "left",
-                        margin: "20px 20px 20px 20px"
-                      }}
-                      key={c.id}
-                    >
-                      <Item data={c} />
-                    </div>
-                  );
-                } else {
-                  return " ";
-                }
-              })}
-            </Skeleton>
+            <Row>
+              {" "}
+              <Search
+                placeholder="搜索商品"
+                onSearch={value => this.search(value)}
+                enterButton
+                style={{ width: "200px", float: "right" }}
+              />
+            </Row>
+            <Row>
+              <Skeleton active loading={this.state.loading_products}>
+                {this.state.search && (
+                  <Title level={3}>搜索 {this.state.searchstr}:</Title>
+                )}
+                {this.state.productList.map(c => {
+                  if (this.state.search) {
+                    if (c.product.name.match(this.state.searchstr))
+                      return (
+                        <div
+                          style={{
+                            float: "left",
+                            margin: "20px 20px 20px 20px"
+                          }}
+                          key={c.id}
+                        >
+                          <Item data={c} />
+                        </div>
+                      );
+                    else return "";
+                  } else {
+                    if (
+                      this.state.currentCategory === 0 ||
+                      c.product.category_id === this.state.currentCategory
+                    ) {
+                      return (
+                        <div
+                          style={{
+                            float: "left",
+                            margin: "20px 20px 20px 20px"
+                          }}
+                          key={c.id}
+                        >
+                          <Item data={c} />
+                        </div>
+                      );
+                    } else {
+                      return " ";
+                    }
+                  }
+                })}
+              </Skeleton>
+            </Row>
           </Content>
         </Layout>
       </div>

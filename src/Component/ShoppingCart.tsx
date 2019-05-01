@@ -20,12 +20,13 @@ import {
 } from "antd";
 import { Product } from "../Util/View";
 import { ClickInput } from "../Util/ClickInput";
+import { bhistory } from "src";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const Panel = Collapse.Panel;
 
-interface shoppingcart {
+export interface shoppingcart {
   [seller_id: number]: {
     id: number;
     count: number;
@@ -42,155 +43,6 @@ interface item {
   img: string;
 }
 
-interface entry {
-  seller_name: string;
-  item: item[];
-}
-
-class CheckOutModal extends React.Component<{ data: any }, {}> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      phone: "未设定",
-      realname: "123",
-      address: "未设定"
-    };
-  }
-
-  state: {
-    phone: string;
-    realname: string;
-    address: string;
-  };
-
-  componentDidMount() {
-    var id = localStorage.getItem("user_id");
-    if (id == undefined) message.warn("请重新登录");
-    else
-      fetch("/api/user/" + id + "/info")
-        .then(r => r.json())
-        .then(r =>
-          this.setState({
-            phone: r.phone,
-            realname: r.realname,
-            address: r.address
-          })
-        );
-  }
-
-  public getInfo() {
-    return {
-      phone: this.state.phone,
-      realname: this.state.realname,
-      address: this.state.address
-    };
-  }
-
-  columns = [
-    {
-      title: "商品名称",
-      render: item => (
-        <div>
-          {
-            this.props.data.product[
-              this.props.data.inventory[item.id].productId
-            ].name
-          }
-        </div>
-      ),
-      key: "name"
-    },
-    {
-      title: "单价",
-      key: "price",
-      render: item => {
-        const inv = this.props.data.inventory[item.id];
-        const prod = this.props.data.product[inv.productId];
-        return (
-          <div>
-            {inv.price}元/{prod.unit}
-          </div>
-        );
-      }
-    },
-    {
-      title: "数量",
-      dataIndex: "count",
-      key: "count"
-    },
-    {
-      title: "总价",
-      render: item => {
-        const inv = this.props.data.inventory[item.id];
-        const prod = this.props.data.product[inv.productId];
-        return <div>{(inv.price * item.count).toFixed(2)}</div>;
-      }
-    }
-  ];
-
-  public renderTable(item: item[]) {
-    return (
-      <Table
-        columns={this.columns}
-        dataSource={item}
-        pagination={false}
-        rowKey={record => record.id.toString()}
-      />
-    );
-  }
-
-  public render() {
-    return (
-      <div>
-        <Row gutter={16}>
-          <Col span={3}>姓名：</Col>
-          <Col span={8}>
-            <ClickInput
-              data={this.state.realname}
-              submit={s => this.setState({ realname: s })}
-            />
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={3}>电话：</Col>
-          <Col span={8}>
-            <ClickInput
-              data={this.state.phone}
-              submit={s => this.setState({ phone: s })}
-            />
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={3}>地址：</Col>
-          <Col span={8}>
-            <ClickInput
-              data={this.state.address}
-              submit={s => this.setState({ address: s })}
-            />
-          </Col>
-        </Row>
-
-        <Collapse bordered={false} style={{ marginTop: "20px" }}>
-          {Object.keys(this.props.data.shoppingcart).map(seller_id => {
-            const seller = this.props.data.seller[seller_id];
-            return (
-              <Panel
-                header={seller.nickname}
-                key={seller.nickname}
-                style={{
-                  paddingTop: "0px"
-                }}
-              >
-                {this.renderTable(this.props.data.shoppingcart[seller_id])}
-              </Panel>
-            );
-          })}
-        </Collapse>
-      </div>
-    );
-  }
-}
-
 export class ShoppingCartAffix extends React.Component {
   // public state = { visible: false };
 
@@ -203,7 +55,8 @@ export class ShoppingCartAffix extends React.Component {
       inventory: {},
       seller: {},
       modalVisible: false,
-      count: 0
+      count: 0,
+      selected: new Set<number>()
     };
   }
 
@@ -233,6 +86,7 @@ export class ShoppingCartAffix extends React.Component {
     shoppingcart: shoppingcart;
     modalVisible: boolean;
     count: number;
+    selected: Set<number>;
   };
   modal;
 
@@ -392,6 +246,15 @@ export class ShoppingCartAffix extends React.Component {
     }
   }
 
+  updateSelected = (invid, status) => {
+    var tmp = this.state.selected;
+    if (status) tmp.add(invid);
+    else tmp.delete(invid);
+    this.setState({
+      selected: tmp
+    });
+  };
+
   renderCartList(itemlist) {
     return itemlist.map(item => {
       const inv = this.state.inventory[item.id];
@@ -412,7 +275,10 @@ export class ShoppingCartAffix extends React.Component {
             }}
             span={2}
           >
-            <Checkbox />
+            <Checkbox
+              value={this.state.selected.has(inv.id)}
+              onChange={e => this.updateSelected(inv.id, e.target.checked)}
+            />
           </Col>
           <Col
             style={{
@@ -466,6 +332,7 @@ export class ShoppingCartAffix extends React.Component {
               icon="close"
               onClick={() => {
                 removeItem(inv.sellerId, item.id);
+                this.updateSelected(inv.id, false);
                 this.refreshShoppingCart();
               }}
             />
@@ -479,7 +346,8 @@ export class ShoppingCartAffix extends React.Component {
     var price = 0;
     Object.values(this.state.shoppingcart).map((item: any) => {
       for (var i of item) {
-        price += i.count * this.state.inventory[i.id].price;
+        if (this.state.selected.has(i.id))
+          price += i.count * this.state.inventory[i.id].price;
       }
     });
     return price;
@@ -493,6 +361,21 @@ export class ShoppingCartAffix extends React.Component {
     this.setState({
       count: count
     });
+  };
+
+  calculateProducts = () => {
+    var tmp: shoppingcart = {};
+    Object.keys(this.state.shoppingcart).map(seller_id => {
+      for (var i of this.state.shoppingcart[seller_id]) {
+        if (this.state.selected.has(i.id)) {
+          if (!tmp.hasOwnProperty(seller_id)) {
+            tmp[seller_id] = [];
+          }
+          tmp[seller_id].push(i);
+        }
+      }
+    });
+    return tmp;
   };
 
   public render() {
@@ -564,7 +447,23 @@ export class ShoppingCartAffix extends React.Component {
               <Col span={6}>
                 <Button
                   style={{ marginRight: "10px", paddingRight: "20px" }}
-                  onClick={this.openModal}
+                  //   onClick={this.openModal}
+                  onClick={() => {
+                    var p = this.calculateProducts();
+                    if (Object.keys(p).length === 0)
+                      message.warn("未勾选任何商品");
+                    else {
+                      var path = {
+                        pathname: "/checkout",
+                        state: {
+                          data: this.state,
+                          list: this.calculateProducts()
+                        }
+                      };
+                      bhistory.push(path);
+                      this.onClose();
+                    }
+                  }}
                   type="primary"
                 >
                   下单
@@ -586,9 +485,7 @@ export class ShoppingCartAffix extends React.Component {
               下单
             </Button>
           ]}
-        >
-          <CheckOutModal ref={this.setModal} data={this.state} />
-        </Modal>
+        />
       </div>
     );
   }

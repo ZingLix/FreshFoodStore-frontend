@@ -53,6 +53,7 @@ export class LoginAvatar extends React.Component {
   logout = () => {
     localStorage.removeItem("user_type");
     localStorage.removeItem("user_id");
+    localStorage.removeItem("shoppingcart");
     this.refreshLoginStatus();
     bhistory.push("/");
     window.location.reload();

@@ -12,19 +12,12 @@ import {
   setshoppingcartref
 } from "./Component/ShoppingCart";
 import { LoginAvatar } from "./Component/Avatar";
+import { CheckOutPage } from "./Component/CheckOutPage";
 
 const { Header, Footer, Sider, Content } = Layout;
 const Search = Input.Search;
 
 class App extends React.Component {
-  search = (
-    <Search
-      placeholder="input search text"
-      onSearch={value => console.log(value)}
-      enterButton
-    />
-  );
-
   public render() {
     return (
       <div className="App">
@@ -68,21 +61,9 @@ class App extends React.Component {
               </div>
             </Link>
             <div style={{ float: "right" }}>
-              {" "}
               <LoginAvatar />
             </div>
-            <div
-              style={{
-                float: "right",
-                marginRight: "20px",
-                marginTop: "6px"
-              }}
-            >
-              <Popover content={this.search} placement="bottom">
-                <Icon type="search" style={{ fontSize: "24px" }} />
-              </Popover>
-            </div>
-            <div
+            {/* <div
               style={{
                 float: "right",
                 marginRight: "20px",
@@ -90,7 +71,7 @@ class App extends React.Component {
               }}
             >
               <Icon type="star" style={{ fontSize: "24px" }} />
-            </div>
+            </div> */}
           </Header>
           <Content
             style={{
@@ -107,6 +88,7 @@ class App extends React.Component {
             <Route path="/product/:id" component={ProductPage} />
             <Route path="/sellerCenter" component={SellerCenter} />
             <Route path="/baseCenter" component={BaseCenter} />
+            <Route path="/checkout" component={CheckOutPage} />
             <ShoppingCartAffix ref={setshoppingcartref} />
           </Content>
           <Footer style={{ textAlign: "center" }} />

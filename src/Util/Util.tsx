@@ -3,7 +3,7 @@ import { message } from "antd";
 export function getUserId() {
   var userid = localStorage.getItem("user_id");
   if (userid == undefined) {
-    message.warn("请重新登陆");
+    message.warn("请重新登录");
     return null;
   }
   return userid;
@@ -14,7 +14,7 @@ export function formatTime(str) {
   return (
     date.getFullYear() +
     "/" +
-    (date.getMonth()+1) +
+    (date.getMonth() + 1) +
     "/" +
     date.getDate() +
     "\xa0\xa0\xa0\xa0" +

@@ -16,7 +16,8 @@ import {
   message,
   Input,
   Empty,
-  Skeleton
+  Skeleton,
+  Col
 } from "antd";
 
 import { OrderDetail, DeliveryInfo } from "../Util/View";
@@ -48,13 +49,13 @@ export class OrderInfomationList extends React.Component<
   }
 
   componentDidMount() {
-    this.updateOrderInfo()
+    this.updateOrderInfo();
   }
 
-  public updateOrderInfo=()=>{
+  public updateOrderInfo = () => {
     this.setState({
-      loading:true
-    })
+      loading: true
+    });
     var list = this.props.fetch();
     if (list != {})
       list.then(r => {
@@ -63,7 +64,7 @@ export class OrderInfomationList extends React.Component<
           loading: false
         });
       });
-  }
+  };
 
   state: {
     current: string;
@@ -86,7 +87,11 @@ export class OrderInfomationList extends React.Component<
           count++;
           return (
             <div key={item.id}>
-              <Order order={item} seller={this.props.seller} update={this.updateOrderInfo}/>
+              <Order
+                order={item}
+                seller={this.props.seller}
+                update={this.updateOrderInfo}
+              />
             </div>
           );
         } else {
@@ -126,88 +131,24 @@ export class OrderInfomationList extends React.Component<
   }
 }
 
-class DeliveryInfoModal extends React.Component<
-  { user_id: number; order_id: number;onClose?:any; },
+class DeliverInfoTimeline extends React.Component<
+  { info: DeliveryInfo[] },
   {}
 > {
-  constructor(props) {
-    super(props);
-    this.state = {
-      visible: false,
-      info: ""
-    };
-  }
-  input;
-  state: {
-    visible: boolean;
-    info: string;
-  };
-  setref = e => (this.input = e);
-  public hide = () => {
-
-    this.setState({ visible: false });
-  };
-  public show = () => {
-    this.setState({ visible: true });
-  };
-  addDeliveryInfo = () => {
-    var msg = this.state.info;
-    var order_id = this.props.order_id;
-    var userid = this.props.user_id;
-    var request = {
-      operation: 2,
-      message: msg
-    };
-    fetch("/api/seller/" + userid + "/order/" + order_id, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: JSON.stringify(request)
-    }).then(r=>{
-      if(r.status==200) {
-        message.success("添加成功");
-        if(this.props.onClose!=null) {
-          this.props.onClose();
-        }
-      }
-      else r.json().then(r=>message.warn(r.msg))
-      this.hide()
-    })
-  };
-
   render() {
+    if (this.props.info.length == 0)
+      return <Empty description={"暂无物流信息"} />;
     return (
-      <Modal
-        visible={this.state.visible}
-        title="订单详情"
-        onCancel={this.hide}
-        onOk={this.addDeliveryInfo}
-      >
-        物流信息：
-        <Input
-          ref={this.setref}
-          value={this.state.info}
-          onChange={e => this.setState({ info: e.target.value })}
-        />
-      </Modal>
+      <Timeline style={{ margin: "12px 12px 0px 12px" }}>
+        {this.props.info.map(d => (
+          <Timeline.Item key={d.time} style={{ paddingBottom: "10px" }}>
+            {formatTime(d.time)}
+            <br />
+            {d.info}
+          </Timeline.Item>
+        ))}
+      </Timeline>
     );
-  }
-}
-
-class DeliverInfoTimeline extends React.Component<{info:DeliveryInfo[]},{}>{
-  render(){
-    if(this.props.info.length==0) return <Empty description={"暂无物流信息"}></Empty>
-    return <Timeline style={{ margin: "12px 12px 0px 12px" }}>
-    {this.props.info.map(d => (
-      <Timeline.Item key={d.time} style={{ paddingBottom: "10px" }}>
-        {formatTime(d.time)}
-        <br />
-        {d.info}
-      </Timeline.Item>
-    ))}
-  </Timeline>
   }
 }
 
@@ -216,19 +157,26 @@ class OrderModal extends React.Component<OrderInfo, {}> {
     super(props);
     this.state = {
       visible: false,
-      tabPosition: "1"
+      tabPosition: "1",
+      deliveryinfo: "",
+      deliveryinfolist: this.props.order.delivery_info
     };
   }
+
   state: {
     visible: boolean;
     tabPosition: string;
+    deliveryinfo: string;
+    deliveryinfolist: DeliveryInfo[];
   };
+
   public hide = () => {
     this.setState({ visible: false });
   };
   public show = () => {
     this.setState({ visible: true });
   };
+
   footerButton = status => {
     var id = 1;
     var buttons = [
@@ -236,13 +184,6 @@ class OrderModal extends React.Component<OrderInfo, {}> {
         关闭
       </Button>
     ];
-    if (this.props.seller && status == 3) {
-      buttons.push(
-        <Button key={id++} onClick={() => this.modal.show()}>
-          更新物流
-        </Button>
-      );
-    }
     if (this.props.seller && status == 2) {
       buttons.push(
         <Button key={id++} onClick={this.sendout}>
@@ -260,10 +201,9 @@ class OrderModal extends React.Component<OrderInfo, {}> {
     return buttons;
   };
 
-  update=()=>{
-    if(this.props.update)
-    this.props.update()
-  }
+  update = () => {
+    if (this.props.update) this.props.update();
+  };
 
   sendout = () => {
     var order_id = this.props.order.id;
@@ -283,15 +223,15 @@ class OrderModal extends React.Component<OrderInfo, {}> {
       },
       method: "POST",
       body: JSON.stringify(request)
-    }).then(r=>{
-      if(r.status==200) {
+    }).then(r => {
+      if (r.status == 200) {
         message.success("发货成功！");
         this.update();
         this.hide();
-      }else{
-        r.json().then(r=>message.warn(r.msg))
+      } else {
+        r.json().then(r => message.warn(r.msg));
       }
-    })
+    });
   };
 
   confirmOrder = () => {
@@ -312,20 +252,61 @@ class OrderModal extends React.Component<OrderInfo, {}> {
         method: "POST",
         body: JSON.stringify(request)
       }
-    ).then(r=>{
-      if(r.status==200){
-       message.success("确认收货成功！");
-       if(this.props.update!=null) this.props.update();
-       this.hide()
-      }  
-      else r.json().then(r=>message.warn(r.msg))
-    })
+    ).then(r => {
+      if (r.status == 200) {
+        message.success("确认收货成功！");
+        if (this.props.update != null) this.props.update();
+        this.hide();
+      } else r.json().then(r => message.warn(r.msg));
+    });
+  };
+
+  addDeliveryInfo = () => {
+    var msg = this.state.deliveryinfo;
+    if (msg == "") {
+      message.warn("信息不能为空");
+      return;
+    }
+    var order_id = this.props.order.id;
+    var userid = this.props.order.seller_id;
+    var request = {
+      operation: 2,
+      message: msg
+    };
+    fetch("/api/seller/" + userid + "/order/" + order_id, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(request)
+    }).then(r => {
+      if (r.status == 200) {
+        message.success("添加成功");
+        var list = this.state.deliveryinfolist;
+        var info = {
+          id: list[list.length - 1].id + 1,
+          orderId: list[0].orderId,
+          time: new Date().toISOString(),
+          info: msg,
+          status: list[list.length - 1].status
+        };
+        list.push(info);
+        this.setState({
+          deliveryinfolist: list,
+          deliveryinfo: ""
+        });
+        //this.update();
+        //this.hide();
+      } else r.json().then(r => message.warn(r.msg));
+    });
   };
 
   modal;
   setref = m => (this.modal = m);
-  onclose=()=>{ 
-    if(this.props.update!=null) this.props.update()}
+  onclose = () => {
+    if (this.props.update != null) this.props.update();
+  };
   render() {
     const order = this.props.order;
     return (
@@ -335,12 +316,6 @@ class OrderModal extends React.Component<OrderInfo, {}> {
         onCancel={this.hide}
         footer={this.footerButton(order.status)}
       >
-        <DeliveryInfoModal
-          ref={this.setref}
-          order_id={this.props.order.id}
-          user_id={this.props.order.seller_id}
-          onClose={this.onclose}
-        />
         <Tabs tabPosition="left">
           <TabPane tab="订单信息" key="1">
             <div>
@@ -391,7 +366,25 @@ class OrderModal extends React.Component<OrderInfo, {}> {
             />
           </TabPane>
           <TabPane tab="物流信息" key="3">
-          <DeliverInfoTimeline info={this.props.order.delivery_info}></DeliverInfoTimeline>
+            <DeliverInfoTimeline info={this.state.deliveryinfolist} />
+            {this.props.seller && order.status == 3 && (
+              <Row type="flex" justify="start" align="middle">
+                <Col span={16}>
+                  <Input
+                    style={{ paddingRight: "10px" }}
+                    value={this.state.deliveryinfo}
+                    onChange={e =>
+                      this.setState({ deliveryinfo: e.target.value })
+                    }
+                  />
+                </Col>
+                <Col span={4} offset={1}>
+                  <Button type="primary" onClick={this.addDeliveryInfo}>
+                    添加
+                  </Button>
+                </Col>
+              </Row>
+            )}
           </TabPane>
         </Tabs>
       </Modal>
@@ -428,10 +421,9 @@ export class Order extends React.Component<OrderInfo, {}> {
     );
   }
 
-  onclose=()=>{
-    if(this.props.update!=null)
-      this.props.update();
-  }
+  onclose = () => {
+    if (this.props.update != null) this.props.update();
+  };
 
   public render() {
     var Order = this.props.order;
@@ -452,7 +444,9 @@ export class Order extends React.Component<OrderInfo, {}> {
           <div style={{ float: "right" }}>
             <Popover
               placement="leftBottom"
-              content={ <DeliverInfoTimeline info={this.props.order.delivery_info}></DeliverInfoTimeline>}
+              content={
+                <DeliverInfoTimeline info={this.props.order.delivery_info} />
+              }
               trigger="hover"
             >
               <div>物流信息</div>

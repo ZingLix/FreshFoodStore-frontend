@@ -20,7 +20,8 @@ import {
 import { Route, Link } from "react-router-dom";
 import { UserInfomationForm } from "../Component/UserInfomationForm";
 import { OrderInfomationList } from "../Component/OrderInfomation";
-import { FundGadget, FundList } from 'src/Component/Fund';
+import { FundGadget, FundList } from "src/Component/Fund";
+import { getUserId } from "src/Util/Util";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -30,61 +31,75 @@ class Overview extends React.Component {
     super(props);
     this.state = {
       username: "用户名",
-      loadingusername: true
+      loadingusername: true,
+      loadingstatistic: true,
+      orderstatistic: { "2": 0, "3": 0 }
     };
   }
 
   state: {
     username: string;
     loadingusername: boolean;
+    loadingstatistic: boolean;
+    orderstatistic: any;
   };
 
   componentWillMount() {
-    var userid = localStorage.getItem("user_id");
-    if (userid == undefined) {
-      message.warn("请重新登陆");
-    } else {
-      fetch("/api/user/" + userid + "/info")
-        .then(r => r.json())
-        .then(r =>
-          this.setState({
-            username: r.nickname,
-            loadingusername: false
-          })
-        );
-    }
+    var userid = getUserId();
+    if (userid == null) return;
+
+    fetch("/api/user/" + userid + "/info")
+      .then(r => r.json())
+      .then(r =>
+        this.setState({
+          username: r.nickname,
+          loadingusername: false
+        })
+      );
+    fetch("/api/user/" + userid + "/overview")
+      .then(r => r.json())
+      .then(r => {
+        this.setState({
+          orderstatistic: r,
+          loadingstatistic: false
+        });
+      });
   }
 
   public render() {
-
     return (
       <div>
-        <Spin spinning={this.state.loadingusername}>
-        <Row type="flex" align="middle" style={{ marginTop: "60px" }}>
-          <Col>
-            <Avatar size={64} icon="user" />
-          </Col>
-          <Col>
-            {" "}
-            <Title level={4} style={{ marginLeft: "40px" }}>
-              {this.state.username}
-            </Title>
-          </Col>
-        </Row>
-        <Row gutter={16} style={{ marginTop: "16px" }}>
-          <Col span={4}>
-            <FundGadget></FundGadget>
-          </Col>
-          <Col span={4}>
-            <Statistic title="待付款订单" value={4} />
-          </Col>
-          <Col span={4}>
-            <Statistic title="待收货订单" value={3} />
-          </Col>
-          <Col span={4}>
-            <Statistic title="待评价订单" value={2} />
-          </Col>
-        </Row>
+        <Spin
+          spinning={this.state.loadingusername || this.state.loadingstatistic}
+        >
+          <Row type="flex" align="middle" style={{ marginTop: "60px" }}>
+            <Col>
+              <Avatar size={64} icon="user" />
+            </Col>
+            <Col>
+              {" "}
+              <Title level={4} style={{ marginLeft: "40px" }}>
+                {this.state.username}
+              </Title>
+            </Col>
+          </Row>
+          <Row gutter={16} style={{ marginTop: "16px" }}>
+            <Col span={4}>
+              <FundGadget />
+            </Col>
+            <Col span={4}>
+              <Statistic
+                title="待发货订单"
+                value={this.state.orderstatistic["2"]}
+              />
+            </Col>
+            <Col span={4}>
+              <Statistic
+                title="配送中订单"
+                value={this.state.orderstatistic["3"]}
+              />
+            </Col>
+          </Row>
         </Spin>
       </div>
     );
@@ -176,10 +191,7 @@ export class UserCenter extends React.Component {
             path="/userCenter/orderInfomation"
             component={OrderInfomation}
           />
-          <Route
-            path="/userCenter/fund"
-            component={FundList}
-          />
+          <Route path="/userCenter/fund" component={FundList} />
         </Content>
       </Layout>
     );

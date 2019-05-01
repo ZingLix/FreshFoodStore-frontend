@@ -14,7 +14,9 @@ export class Overview extends React.Component {
       fund: 0,
       visible: false,
       topupvalue: 0,
-      loadingnickname: true
+      loadingnickname: true,
+      loadingstatistic: true,
+      orderstatistic: { "2": 0, "3": 0 }
     };
   }
 
@@ -24,6 +26,8 @@ export class Overview extends React.Component {
     visible: boolean;
     topupvalue: number;
     loadingnickname: boolean;
+    loadingstatistic: boolean;
+    orderstatistic: any;
   };
 
   componentDidMount() {
@@ -39,6 +43,14 @@ export class Overview extends React.Component {
         );
       }
     });
+    fetch("/api/seller/" + userid + "/overview")
+      .then(r => r.json())
+      .then(r => {
+        this.setState({
+          orderstatistic: r,
+          loadingstatistic: false
+        });
+      });
   }
 
   public render() {
@@ -61,10 +73,16 @@ export class Overview extends React.Component {
               <FundGadget />
             </Col>
             <Col span={4}>
-              <Statistic title="待发货订单" value={4} />
+              <Statistic
+                title="待发货订单"
+                value={this.state.orderstatistic["2"]}
+              />
             </Col>
             <Col span={4}>
-              <Statistic title="配送中订单" value={3} />
+              <Statistic
+                title="配送中订单"
+                value={this.state.orderstatistic["3"]}
+              />
             </Col>
           </Row>{" "}
         </Spin>
