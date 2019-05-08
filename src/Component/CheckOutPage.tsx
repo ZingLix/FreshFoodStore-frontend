@@ -128,7 +128,7 @@ export class CheckOutPage extends React.Component<
           return (
             <List.Item>
               <List.Item.Meta
-                avatar={<Avatar src={"/img/" + product.img} />}
+                avatar={<Avatar src={"/img/products/" + product.img} />}
                 title={product.name}
                 description={i.count + " * " + product.unit}
                 key={i.id}

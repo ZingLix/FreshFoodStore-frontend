@@ -4,31 +4,12 @@ import {
   Layout,
   Menu,
   Typography,
-  Statistic,
-  Row,
-  Col,
-  Button,
-  Avatar,
-  Divider,
+
   Affix,
   Tabs,
-  Table,
-  InputNumber,
-  Form,
-  Input,
-  Tooltip,
-  Icon,
-  Cascader,
-  Select,
-  Checkbox,
-  Tag,
-  Modal
+
 } from "antd";
 import { Route, Link } from "react-router-dom";
-import { UserInfomationForm } from "../Component/UserInfomationForm";
-import { Order, OrderInfomationList } from "../Component/OrderInfomation";
-import { OrderDetail } from "../Util/View";
-import Column from "antd/lib/table/Column";
 import { FundList } from "src/Component/Fund";
 import { Product } from "./ProductList";
 import { Category } from './Category';
@@ -36,10 +17,6 @@ import { OrderInfo } from './OrderList';
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 const TabPane = Tabs.TabPane;
-
-
-
-
 
 export class BaseCenter extends React.Component {
   public render() {

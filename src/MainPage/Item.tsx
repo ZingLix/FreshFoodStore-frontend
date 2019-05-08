@@ -38,7 +38,7 @@ export class Item extends React.Component<itemProps, {}> {
           <Link to={"/product/" + this.props.data.id}>
             <img
               alt="example"
-              src={"/img/" + this.props.data.product.img}
+              src={"/img/products/" + this.props.data.product.img}
               style={{ width: "100%", height: 250 }}
             />
           </Link>

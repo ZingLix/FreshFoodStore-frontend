@@ -288,7 +288,7 @@ export class ShoppingCartAffix extends React.Component {
             span={4}
           >
             <img
-              src={"/img/" + prod.img}
+              src={"/img/products/" + prod.img}
               style={{ width: "50px", height: "50px" }}
             />
           </Col>

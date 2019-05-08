@@ -66,7 +66,7 @@ export class ProductPage extends React.Component<{ match: any }, {}> {
         >
           <Col span={8}>
             <img
-              src={"/img/" + this.state.product_info.img}
+              src={"/img/products/" + this.state.product_info.img}
               style={{ width: "100%", padding: "20px" }}
             />
           </Col>

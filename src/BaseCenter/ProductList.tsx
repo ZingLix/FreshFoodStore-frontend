@@ -15,15 +15,17 @@ import {
   InputNumber,
   Form,
   Input,
-  Tooltip,
   Icon,
   Cascader,
   Select,
   Checkbox,
   Tag,
-  Modal
+  Modal,
+  Upload,
+  message
 } from "antd";
-
+import { fileToObject } from "antd/lib/upload/utils";
+const Option = Select.Option;
 interface product {
   id: number;
   name: string;
@@ -60,7 +62,7 @@ export class Product extends React.Component {
       title: "示例图",
       key: "img",
       render: item => (
-        <img src={"/img/" + item.img} style={{ width: "100px" }} />
+        <img src={"/img/products/" + item.img} style={{ width: "100px" }} />
       )
     },
     {
@@ -107,7 +109,14 @@ export class Product extends React.Component {
 
   private form;
 
-  componentWillMount() {
+  componentDidMount() {
+    this.fetchdata();
+  }
+
+  fetchdata = () => {
+    this.setState({
+      loading_category: true
+    });
     fetch("/api/products/category")
       .then((response: any) => response.json())
       .then((d: any) => {
@@ -128,7 +137,7 @@ export class Product extends React.Component {
           loading_inventory: false
         });
       });
-  }
+  };
 
   showModal = () => {
     this.setState({
@@ -143,8 +152,9 @@ export class Product extends React.Component {
   };
 
   submitProduct = () => {
-    this.form.submit();
-    this.hideModal();
+    if (this.form.submit()) {
+      this.hideModal();
+    }
   };
 
   showModalwithProduct = product => {
@@ -162,7 +172,11 @@ export class Product extends React.Component {
           onOk={this.submitProduct}
           forceRender
         >
-          <ProductInfoForm ref={comp => (this.form = comp)} />
+          <ProductInfoForm
+            ref={comp => (this.form = comp)}
+            onSubmit={this.fetchdata}
+            category={this.state.category}
+          />
         </Modal>
         <Button
           type="primary"
@@ -178,14 +192,22 @@ export class Product extends React.Component {
           dataSource={this.state.products}
           rowKey={item => item.id.toString()}
           columns={this.column}
-          loading={this.state.loading_category||this.state.loading_inventory}
+          loading={this.state.loading_category || this.state.loading_inventory}
         />
       </div>
     );
   }
 }
 
-class ProductInfoForm extends React.Component {
+class ProductInfoForm extends React.Component<
+  {
+    onSubmit?: any;
+    category: {
+      [id: number]: string;
+    };
+  },
+  {}
+> {
   constructor(props) {
     super(props);
 
@@ -198,12 +220,14 @@ class ProductInfoForm extends React.Component {
         img: "",
         price: 0,
         count: 0
-      }
+      },
+      loading: false
     };
   }
 
   state: {
     productinfo: product;
+    loading: boolean;
   };
 
   public setProduct(p: product) {
@@ -227,6 +251,21 @@ class ProductInfoForm extends React.Component {
   }
 
   public submit() {
+    var info = this.state.productinfo;
+    if (this.state.productinfo.img == "") {
+      message.warn("未上传图片！");
+      return false;
+    }
+    if (
+      info.category_id == 0 ||
+      info.count == 0 ||
+      info.name == "" ||
+      info.price == 0 ||
+      info.unit == ""
+    ) {
+      message.warn("信息不完整！");
+      return false;
+    }
     if (this.state.productinfo.id == 0) {
       fetch("/api/base/inventory", {
         headers: {
@@ -235,6 +274,11 @@ class ProductInfoForm extends React.Component {
         },
         method: "POST",
         body: JSON.stringify(this.state.productinfo)
+      }).then(r => {
+        if (r.status == 200) {
+          message.success("添加成功");
+          if (this.props.onSubmit != null) this.props.onSubmit();
+        }
       });
     } else {
       fetch("/api/base/inventory/" + this.state.productinfo.id, {
@@ -244,9 +288,43 @@ class ProductInfoForm extends React.Component {
         },
         method: "PUT",
         body: JSON.stringify(this.state.productinfo)
+      }).then(r => {
+        if (r.status == 200) {
+          message.success("修改成功");
+          if (this.props.onSubmit != null) this.props.onSubmit();
+        }
       });
     }
+    return true;
   }
+  beforeUpload(file) {
+    const isJPG = file.type === "image/jpeg";
+    const isPNG = file.type === "image/png";
+    if (!isJPG && !isPNG) {
+      message.error("只能上传jpg或png文件!");
+    }
+    // const isLt2M = file.size / 1024 / 1024 < 2;
+    // if (!isLt2M) {
+    //   message.error('Image must smaller than 2MB!');
+    // }
+    return isJPG || isPNG;
+  }
+
+  handleChange = info => {
+    if (info.file.status === "done") {
+      var tmp = this.state.productinfo;
+      tmp.img = info.file.response["filename"];
+      this.setState({
+        productinfo: tmp
+      });
+    }
+  };
+
+  handleCategoryChange = val => {
+    var tmp = this.state.productinfo;
+    tmp.category_id = val;
+    this.setProduct(tmp);
+  };
 
   render() {
     const formItemLayout = {
@@ -259,7 +337,13 @@ class ProductInfoForm extends React.Component {
         sm: { span: 18 }
       }
     };
-
+    const uploadButton = (
+      <div>
+        <Icon type={this.state.loading ? "loading" : "plus"} />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    );
+    const imageUrl = this.state.productinfo.img;
     return (
       <Form {...formItemLayout}>
         <Form.Item label="名称">
@@ -287,7 +371,7 @@ class ProductInfoForm extends React.Component {
           />
         </Form.Item>
         <Form.Item label="分类">
-          <Input
+          {/* <Input
             value={this.state.productinfo.category_id}
             onChange={e => {
               var tmp = this.state.productinfo;
@@ -295,11 +379,21 @@ class ProductInfoForm extends React.Component {
               this.setState({
                 productinfo: tmp
               });
-            }}
-          />
+            }} */}
+          <Select
+            value={this.props.category[this.state.productinfo.category_id]}
+            onChange={this.handleCategoryChange}
+          >
+            <Option value={0} />
+            {Object.keys(this.props.category).map(key => (
+              <Option key={key} value={key}>
+                {this.props.category[key]}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
         <Form.Item label="示例图">
-          <Input
+          {/* <Input
             value={this.state.productinfo.img}
             onChange={e => {
               var tmp = this.state.productinfo;
@@ -308,7 +402,25 @@ class ProductInfoForm extends React.Component {
                 productinfo: tmp
               });
             }}
-          />
+          /> */}
+          <Upload
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            action="/upload/products"
+            beforeUpload={this.beforeUpload}
+            onChange={this.handleChange}
+          >
+            {imageUrl != "" ? (
+              <img
+                src={"/img/products/" + imageUrl}
+                alt="avatar"
+                style={{ width: "300px", height: "300px" }}
+              />
+            ) : (
+              uploadButton
+            )}
+          </Upload>
         </Form.Item>
         <Form.Item label="价格">
           <Input

@@ -355,7 +355,9 @@ class OrderModal extends React.Component<OrderInfo, {}> {
               renderItem={item => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={<Avatar src={"/img/" + item.product.img} />}
+                    avatar={
+                      <Avatar src={"/img/products/" + item.product.img} />
+                    }
                     title={item.product.name}
                     description={item.count + " * " + item.product.unit}
                     key={item.id}
@@ -461,7 +463,7 @@ export class Order extends React.Component<OrderInfo, {}> {
             renderItem={item => (
               <List.Item>
                 <List.Item.Meta
-                  avatar={<Avatar src={"/img/" + item.product.img} />}
+                  avatar={<Avatar src={"/img/products/" + item.product.img} />}
                   title={item.product.name}
                   description={item.count + " * " + item.product.unit}
                   key={item.id}

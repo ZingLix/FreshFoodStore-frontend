@@ -66,6 +66,8 @@ class Overview extends React.Component {
       });
   }
 
+  showAvatar=()=>{}
+
   public render() {
     return (
       <div>
@@ -74,7 +76,8 @@ class Overview extends React.Component {
         >
           <Row type="flex" align="middle" style={{ marginTop: "60px" }}>
             <Col>
-              <Avatar size={64} icon="user" />
+            <div onClick={this.showAvatar}>
+                <Avatar size={64} icon="user" /></div>
             </Col>
             <Col>
               {" "}
