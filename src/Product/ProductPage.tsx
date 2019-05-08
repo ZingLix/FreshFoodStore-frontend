@@ -70,7 +70,7 @@ export class ProductPage extends React.Component<{ match: any }, {}> {
               style={{ width: "100%", padding: "20px" }}
             />
           </Col>
-          <Col span={16}>
+          <Col span={10}>
             <Title level={2}>{this.state.product_info.name}</Title>
             <List
               itemLayout="vertical"

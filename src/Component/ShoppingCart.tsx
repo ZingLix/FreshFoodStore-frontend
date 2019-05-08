@@ -21,6 +21,7 @@ import {
 import { Product } from "../Util/View";
 import { ClickInput } from "../Util/ClickInput";
 import { bhistory } from "src";
+import { getUserType } from "src/Util/Util";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -116,6 +117,15 @@ export class ShoppingCartAffix extends React.Component {
   }
 
   private showDrawer = () => {
+    var type = getUserType();
+    if (type == 2) {
+      message.warn("不支持卖家购物，进货请从卖家中心进行。");
+      return;
+    }
+    if (type == 3) {
+      message.warn("不支持采买基地购物！");
+      return;
+    }
     this.refreshShoppingCart();
     this.setState({
       visible: true

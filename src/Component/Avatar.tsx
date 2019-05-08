@@ -102,21 +102,21 @@ export class ChangeableAvatar extends React.Component{
   constructor(props){
     super(props)
     this.state={
-      imgsrc:""
+      img:""
     }
   }
 
   state:{
-    imgsrc:string
+    img:string
   }
 
   render(){
     return (<div>
-      {this.state.imgsrc==""&&
+      {this.state.img==""&&
       <Avatar size={64} icon="user" ></Avatar>
       }{
-        this.state.imgsrc!=""&&
-        <Avatar size={64} src={this.state.imgsrc}></Avatar>
+        this.state.img!=""&&
+        <Avatar size={64} src={this.state.img}></Avatar>
       }
       </div>)
   }

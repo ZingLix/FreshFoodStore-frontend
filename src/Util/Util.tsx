@@ -8,6 +8,14 @@ export function getUserId() {
   }
   return userid;
 }
+export function getUserType() {
+  var type = localStorage.getItem("user_type");
+  if (type == undefined) {
+    return 0;
+  }
+  return type;
+}
+
 
 export function formatTime(str) {
   let date = new Date(str);

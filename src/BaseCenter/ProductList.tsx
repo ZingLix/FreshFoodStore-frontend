@@ -371,15 +371,6 @@ class ProductInfoForm extends React.Component<
           />
         </Form.Item>
         <Form.Item label="分类">
-          {/* <Input
-            value={this.state.productinfo.category_id}
-            onChange={e => {
-              var tmp = this.state.productinfo;
-              tmp.category_id = parseInt(e.target.value);
-              this.setState({
-                productinfo: tmp
-              });
-            }} */}
           <Select
             value={this.props.category[this.state.productinfo.category_id]}
             onChange={this.handleCategoryChange}
@@ -393,16 +384,6 @@ class ProductInfoForm extends React.Component<
           </Select>
         </Form.Item>
         <Form.Item label="示例图">
-          {/* <Input
-            value={this.state.productinfo.img}
-            onChange={e => {
-              var tmp = this.state.productinfo;
-              tmp.img = e.target.value;
-              this.setState({
-                productinfo: tmp
-              });
-            }}
-          /> */}
           <Upload
             listType="picture-card"
             className="avatar-uploader"
