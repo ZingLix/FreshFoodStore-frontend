@@ -39,6 +39,8 @@ services:
     restart: always    
     ports:      # 映射端口
       - 80:80
+    volumes:
+      - ./data/img:/usr/share/nginx/html/img
 ```
 
 之后运行 `docker-compose up -d` 就会运行于 80 端口上。如果你需要将前后端同时使用 Docker 构建，看[这里](https://github.com/ZingLix/FreshFoodStore/wiki/%E4%BD%BF%E7%94%A8-Docker-%E8%BF%90%E8%A1%8C%E6%95%B4%E4%B8%AA%E7%B3%BB%E7%BB%9F)。
