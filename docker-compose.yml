@@ -1,0 +1,8 @@
+version: '3'    #指定compose版本
+services:
+  log:    #服务名称
+    image: zinglix/freshfoodstore-fe:0.0.1    #指定镜像名称
+    container_name: harbor-log  #启动后的容器名称
+    restart: always    #down掉自动重启
+    ports:    #映射出来的端口
+      - 5000:5000
