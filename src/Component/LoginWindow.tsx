@@ -61,6 +61,11 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
   register = e => {
     if (this.state.request.username == "" || this.state.request.password == "")
       message.warn("用户名和密码不能为空");
+    else if (
+      this.state.request.password.length < 6 ||
+      this.state.request.password.length > 20
+    )
+      message.warn("密码过短");
     else
       fetch("/api/user", {
         headers: {
@@ -73,7 +78,7 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
         if (response.status == 200) {
           var j = response.json().then(r => message.success(r.msg));
         } else {
-          message.error(response.json().then(r => r.msg));
+          response.json().then(r => message.error(r.msg));
         }
       });
   };
@@ -127,9 +132,9 @@ class HorizontalLoginForm extends React.Component<Props, {}> {
             valuePropName: "checked",
             initialValue: true
           })(<Checkbox>记住此次登录</Checkbox>)}
-          <a className="login-form-forgot" href="" style={{ float: "right" }}>
+          {/* <a className="login-form-forgot" href="" style={{ float: "right" }}>
             忘记密码
-          </a>
+          </a> */}
           <Button type="primary" onClick={this.login} style={{ width: "100%" }}>
             登录
           </Button>
