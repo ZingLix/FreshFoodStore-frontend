@@ -3,7 +3,10 @@ import { Button, Table, InputNumber, message } from "antd";
 import { getUserId } from "src/Util/Util";
 import { OrderInfomationList } from "src/Component/OrderInfomation";
 
-class StockButton extends React.Component<{ Productid: number }, {}> {
+class StockButton extends React.Component<
+  { Productid: number; onClick?: any },
+  {}
+> {
   constructor(props) {
     super(props);
     this.state = {
@@ -33,7 +36,10 @@ class StockButton extends React.Component<{ Productid: number }, {}> {
       body: JSON.stringify(list)
     }).then(res => {
       if (res.status == 400) res.json().then(r => message.error(r.msg));
-      else res.json().then(message.success("下单成功！"));
+      else {
+        message.success("下单成功！");
+        if (this.props.onClick) this.props.onClick();
+      }
     });
   };
 
@@ -73,6 +79,13 @@ export class Stock extends React.Component {
     loading: boolean;
   };
   componentDidMount() {
+    this.refreshData();
+  }
+
+  refreshData = () => {
+    this.setState({
+      loading: true
+    });
     fetch("/api/seller/baseProducts")
       .then(response => response.json())
       .then(r => {
@@ -81,7 +94,7 @@ export class Stock extends React.Component {
           loading: false
         });
       });
-  }
+  };
 
   column = [
     {
@@ -110,7 +123,7 @@ export class Stock extends React.Component {
         let val: number | undefined = 0;
         return (
           <div>
-            <StockButton Productid={record.id} />
+            <StockButton Productid={record.id} onClick={this.refreshData} />
           </div>
         );
       }

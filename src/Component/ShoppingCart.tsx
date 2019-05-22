@@ -174,26 +174,33 @@ export class ShoppingCartAffix extends React.Component {
         },
         method: "POST",
         body: JSON.stringify(request)
+      }).then(r => {
+        if (r.status == 200) {
+          // let secondsToGo = 5;
+          // const modal = Modal.success({
+          //   title: "下单成功",
+          //   content: `${secondsToGo} 秒后返回.`
+          // });
+          // const timer = setInterval(() => {
+          //   secondsToGo -= 1;
+          //   modal.update({
+          //     content: `${secondsToGo} 秒后返回.`
+          //   });
+          // }, 1000);
+          // setTimeout(() => {
+          //   clearInterval(timer);
+          //   modal.destroy();
+          // }, secondsToGo * 1000);
+          // this.setState({
+          //   modalVisible: false
+          // });
+        } else {
+          r.json().then(r => {
+            message.warn(r.msg);
+          });
+        }
       });
       //console.log(this.state.inventory[item[0].id].sellerId);
-    });
-    let secondsToGo = 5;
-    const modal = Modal.success({
-      title: "下单成功",
-      content: `${secondsToGo} 秒后返回.`
-    });
-    const timer = setInterval(() => {
-      secondsToGo -= 1;
-      modal.update({
-        content: `${secondsToGo} 秒后返回.`
-      });
-    }, 1000);
-    setTimeout(() => {
-      clearInterval(timer);
-      modal.destroy();
-    }, secondsToGo * 1000);
-    this.setState({
-      modalVisible: false
     });
   };
 

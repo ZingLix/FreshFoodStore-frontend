@@ -96,6 +96,8 @@ export class ProductPage extends React.Component<{ match: any }, {}> {
                           {item.price} 元 / {this.state.product_info.unit}
                           <br />
                           {formatTime(item.time)}
+                          <br />
+                          剩余：{item.count}
                         </div>
                       </List.Item>
                     )}
